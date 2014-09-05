@@ -24,6 +24,6 @@ class FileWriter(object):
 		Arguments:
 		json_data -- A JSON serializable object.
 		"""
-		pretty_string = json.dumps(json_data, indent=4, ensure_ascii=False)
+		pretty_string = json.dumps(json_data, indent=4)
 		with open(self._filepath, 'w') as output_file:
 			output_file.write(pretty_string)
