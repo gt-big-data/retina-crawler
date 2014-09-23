@@ -18,6 +18,7 @@ def main():
 				filename = hashlib.md5(article_data["title"]).hexdigest() + ".txt"
 				writer = FileWriter(filename)
 				writer.write(article_data)
+				time.sleep(0.1) # So we don't get blocked
 		except Exception, e:
 			logging.error(str(e))
 			time.sleep(0.5)
