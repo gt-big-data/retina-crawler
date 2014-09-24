@@ -1,4 +1,6 @@
 import json
+import pymongo
+import sys
 
 class PrintWriter(object):
 	"""Class for writing JSON data to the screen."""
@@ -27,3 +29,21 @@ class FileWriter(object):
 		pretty_string = json.dumps(json_data, indent=4)
 		with open(self._filepath, 'w') as output_file:
 			output_file.write(pretty_string)
+
+class MongoWriter():
+
+    def __init__(self, host="localhost", port=27017):
+      self.m = pymongo.MongoClient(host, port)
+      self.db = self.m.retina
+
+    def write(self, article):
+        try:
+            self.db.crawlerarticles.insert(article)
+        except:
+            print("Unexpected error:", sys.exc_info()[0])
+
+
+
+
+
+
