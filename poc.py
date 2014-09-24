@@ -1,5 +1,6 @@
 import article
-from writers import PrintWriter, FileWriter
+from writers import PrintWriter, FileWriter, MongoWriter
+from ArticleInserter import ArticleInserter
 from RssFeedParser import RssLinkParser
 import hashlib
 import logging
@@ -24,6 +25,7 @@ def main():
 
 		for feed in feeds:
 			feed_parser = RssLinkParser(feed)
+			article_writer = ArticleInserter(object, feed_parser)
 			try:
 				links = feed_parser.get_links()
 				
