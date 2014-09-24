@@ -41,9 +41,3 @@ class MongoWriter():
             self.db.crawlerarticles.insert(article)
         except:
             print("Unexpected error:", sys.exc_info()[0])
-
-
-
-
-
-
