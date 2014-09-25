@@ -6,17 +6,17 @@ import hashlib
 import logging
 import time
 
-feeds = ["http://rss.cnn.com/rss/edition.rss",
-		"http://feeds.feedburner.com/hacker-news-feed?format=xml",
+feeds = ["http://rss.cnn.com/rss/edition.rss", # world/national news
 		"http://feeds.abcnews.com/abcnews/topstories",
-		"http://www.tmz.com/rss.xml",
 		"http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml",
-		"http://www.reddit.com/.rss",
-		"http://www.ajc.com/list/rss/news/local/news-georgia-and-region/aCxP/",
-		"http://sports.espn.go.com/espn/rss/news",
-		"http://online.wsj.com/xml/rss/3_7455.xml",
-		"http://feeds.feedburner.com/TechCrunch/",
-		"http://podcasts.engadget.com/rss.xml"
+		"http://www.ajc.com/list/rss/news/local/news-georgia-and-region/aCxP/", # local news		
+		"http://www.reddit.com/.rss", # entertainment
+		"http://www.tmz.com/rss.xml",
+		"http://sports.espn.go.com/espn/rss/news", # sports
+		"http://online.wsj.com/xml/rss/3_7455.xml", # finance
+		"http://feeds.feedburner.com/TechCrunch/", #tech
+		"http://podcasts.engadget.com/rss.xml",
+		"http://feeds.feedburner.com/hacker-news-feed?format=xml",
 		]
 
 def main():
