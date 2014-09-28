@@ -20,21 +20,17 @@ feeds = ["http://rss.cnn.com/rss/edition.rss", # world/national news
 		]
 
 def main():
-
+	article_writer = MongoWriter()
+	feed_parsers = [RssLinkParser(feed) for feed in feeds]
 	while True:
-
-		for feed in feeds:
-			feed_parser = RssLinkParser(feed)
-			article_writer = ArticleInserter(object, feed_parser)
+		for feed_parser in feed_parsers:
 			try:
-				links = feed_parser.get_links()
+				links = feed_parser.get_new_links()
 				
 				for link in links:
 					article_info = article.create_article(link)
 					article_data = article.article_dictionary(article_info)
-					filename = hashlib.md5(article_data["title"]).hexdigest() + ".txt"
-					writer = FileWriter(filename)
-					writer.write(article_data)
+					article_writer.write(article_data)
 					time.sleep(0.1) # So we don't get blocked
 			except Exception, e:
 				logging.error(str(e))

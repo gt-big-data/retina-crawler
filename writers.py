@@ -1,6 +1,7 @@
 import json
 import pymongo
 import sys
+import hashlib
 
 class PrintWriter(object):
 	"""Class for writing JSON data to the screen."""
@@ -17,8 +18,6 @@ class PrintWriter(object):
 
 class FileWriter(object):
 	"""Class for writing JSON data to a file."""
-	def __init__(self, filepath):
-		self._filepath = filepath
 
 	def write(self, json_data):
 		"""Write a JSON serializable object to a file.
@@ -26,8 +25,9 @@ class FileWriter(object):
 		Arguments:
 		json_data -- A JSON serializable object.
 		"""
+		filepath = hashlib.md5(json_data["title"]).hexdigest() + ".txt"
 		pretty_string = json.dumps(json_data, indent=4)
-		with open(self._filepath, 'w') as output_file:
+		with open(filepath, 'w') as output_file:
 			output_file.write(pretty_string)
 
 class MongoWriter():
@@ -38,6 +38,7 @@ class MongoWriter():
 
     def write(self, article):
         try:
-            self.db.crawlerarticles.insert(article)
+            self.db.CrawledArticles.insert({'hello' : 'world'})
         except:
             print("Unexpected error:", sys.exc_info()[0])
+

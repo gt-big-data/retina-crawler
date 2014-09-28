@@ -6,7 +6,7 @@ class RssLinkParser(object):
         self.etag = None
         self.rss_url = rss_url
 
-    def get_links(self):
+    def get_new_links(self):
         feed = feedparser.parse(self.rss_url, etag = self.etag)
         if 'etag' in feed:
             self.etag = feed.etag
