@@ -1,29 +1,40 @@
-import article
-from writers import PrintWriter, FileWriter
-from RssFeedParser import RssLinkParser
-import hashlib
-import newspaper
-import feedfinder
+import CrawlerRunners
+import sys
+import json
+import logging
+import time
 
-def get_all_the_feeds():
-	for url in newspaper.popular_urls():
-		rss_feeds = feedfinder.feeds(url)
-		for rss_feed in rss_feeds:
-			process_url(rss_feed)
-
-def process_url(url):
-	feed_parser = RssLinkParser(url)
-	links = feed_parser.get_links()
-	
-	for link in links:
-		article_info = article.create_article(link)
-		article_data = article.article_dictionary(article_info)
-		filename = hashlib.md5(article_data["title"]).hexdigest() + ".txt"
-		writer = FileWriter(filename)
-		writer.write(article_data)
+logging.basicConfig(level=logging.INFO)
+logger = logger = logging.getLogger('retina-crawler')
 
 def main():
-	process_url("http://rss.cnn.com/rss/edition.rss")
+    runner = None
+    logger.info('RETINA CRAWLER starting..')
+    try:
+        if len(sys.argv) < 2:
+            runner = CrawlerRunners.SimpleRunner()
+        else:
+            config = None
+            config_file_path = sys.argv[1]
+            with open(config_file_path) as f:
+                config = json.load(f)
+            runner_type = getattr(CrawlerRunners, config['runner'])
+            logger.info('loaded runner "{}"'.format(config['runner']))
+            if 'args' in config:
+                runner = runner_type(config['args'])
+            else:
+                runner = runner_type()
+    except Exception, e:
+        logger.error('Invalid config given, error is "{}"'.format(str(e)))
+        sys.exit(-1)
 
+    while True:
+        try:
+            logger.info('Running at {}'.format(time.time()))
+            runner.run()
+        except Exception, e:
+            logger.error(str(e))
+            time.sleep(0.5)
+        
 if __name__ == "__main__":
-	main()
+    main()
