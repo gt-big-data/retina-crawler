@@ -1,7 +1,7 @@
 import article
 
 class ArticleDownloader(object):
-    def __init__(self, url):
+	def __init__(self, url):
 		"""Create a LinkDownloader.
 		
 		Arguments:
