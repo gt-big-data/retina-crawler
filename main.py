@@ -9,7 +9,7 @@ def find_articles(url):
 
 def main():
 	links = find_articles("http://rss.cnn.com/rss/edition.rss")
-	downloader = SingleThreadedDownloader(FileWriter())
+	downloader = MultiProcessDownloader(FileWriter())
 	for link in links:
 		downloader.queue_link(link)
 
