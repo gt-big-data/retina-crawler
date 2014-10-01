@@ -25,8 +25,7 @@ def main():
             else:
                 runner = runner_type()
     except Exception, e:
-        logger.error('Invalid config given, error is "{}"'.format(str(e)))
-        sys.exit(-1)
+        raise
 
     while True:
         try:

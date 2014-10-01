@@ -6,6 +6,7 @@ class SeveralRSSMongoRunner(object):
     def __init__(self, config):
         self._rssParser = MultiRSSLinkParsers(config['feeds'])
         mongo_kw_args = config['mongo_params'] if 'mongo_params' in config else {}
+        
         self._article_writer = MongoWriter(**mongo_kw_args)
 
     def run(self):

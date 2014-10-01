@@ -1,0 +1,15 @@
+{
+	"runner" : "SeveralRSSMongoRunner",
+	"args" : {
+		"feeds" : [
+			"http://rss.cnn.com/rss/edition.rss",
+			"http://feeds.abcnews.com/abcnews/topstories",
+			"http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+			"http://www.ajc.com/list/rss/news/local/news-georgia-and-region/aCxP/"
+		],
+		"mongo_params": {
+			"host" : "146.148.59.202",
+			"port" : 27017
+		}
+	}
+}
