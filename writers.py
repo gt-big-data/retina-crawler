@@ -38,7 +38,7 @@ class MongoWriter():
 
     def write(self, article):
         try:
-            self.db.CrawledArticles.insert({'hello' : 'world'})
+            self.db.CrawledArticles.insert(article)
         except:
             print("Unexpected error:", sys.exc_info()[0])
 

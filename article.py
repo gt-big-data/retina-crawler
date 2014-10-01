@@ -13,9 +13,6 @@ def create_article(article_url):
     article.parse()
     return article
 
-# def create_articles(article_urls):
-
-
 def article_dictionary(article):
     if (not article.is_downloaded):
         article.download()
@@ -30,12 +27,14 @@ def article_dictionary(article):
     dict['canonical_link'] = article.canonical_link
     dict['images'] = article.images
     dict['article_html'] = article.article_html
-    dict['additional.additional_data'] = article.additional_data
+    # additional data causes 'bson.errors.InvalidDocument' error
+    #dict['additional.additional_data'] = article.additional_data
     dict['keywords'] = article.keywords
     dict['imgs'] = article.imgs
     dict['text'] = article.text
     dict['meta_data'] = article.meta_data
-    dict['html'] = article.html
+    # html causes '[Parse lxml ERR] line 880: htmlParseEntityRef: expecting ';'' error
+    # dict['html'] = article.html
     dict['meta_description'] = article.meta_description
     dict['meta_keywords'] = article.meta_keywords
     dict['meta_lang'] = article.meta_lang
