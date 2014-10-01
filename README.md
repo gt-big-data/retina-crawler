@@ -59,4 +59,4 @@ Which RSS feed will this pull from? Let's say we want to test out the New York T
 }
 ```
 
-The `"runner"` field in the JSON file is the name of the class you defined in `CrawlerRunners.py`, and the `args` field is a dict that will be passed directly to the constructor.
+The `"runner"` field in the JSON file is the name of the class you defined in `CrawlerRunners.py`, and the `args` field is a dict that will be passed directly to the constructor of your runner.
