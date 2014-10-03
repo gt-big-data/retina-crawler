@@ -3,6 +3,7 @@ import pymongo
 import sys
 import hashlib
 import os
+import errno
 
 class PrintWriter(object):
     """Class for writing JSON data to the screen."""

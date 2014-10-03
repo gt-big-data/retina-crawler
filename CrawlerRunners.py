@@ -20,7 +20,7 @@ class SimpleRunner(object):
         self._article_writer = FileWriter()
 
     def run(self):
-        for link in self._rssParser.get_new_links():
-            article_info = article.create_article(link)
-            article_data = article.article_dictionary(article_info)
+        for art in self._rssParser.get_new_articles():
+            # article_info = article.create_article(link)
+            article_data = art.__dict__
             self._article_writer.write(article_data)
