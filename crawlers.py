@@ -46,7 +46,7 @@ class ModularCrawler(object):
         except Exception, e:
             #TODO: Add logging about bad config because no threads given.
             sys.exit(-1)
-        
+
         # TODO: Add support for grabbing feeds.
 
         self._downloader = downloader
@@ -59,7 +59,7 @@ class SeveralRSSMongoCrawler(object):
     def __init__(self, config):
         self._rssParser = MultiRSSLinkParsers(config['feeds'])
         mongo_kw_args = config['mongo_params'] if 'mongo_params' in config else {}
-        
+
         self._article_writer = MongoWriter(**mongo_kw_args)
 
     def crawl(self):
@@ -74,6 +74,6 @@ class SimpleCrawler(object):
 
     def crawl(self):
         downloader = SingleThreadedDownloader(FileWriter())
-        for link in self._rssParser.get_new_links():
+        for article in self._rssParser.get_new_articles():
             downloader.queue_link(link)
         downloader.process_all()
