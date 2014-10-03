@@ -45,7 +45,6 @@ def check_and_make_dir(path):
             raise
 
 class MongoWriter():
-
     def __init__(self, host, port):
       self.m = pymongo.MongoClient(host, port)
       self.db = self.m.big_data

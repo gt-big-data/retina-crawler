@@ -20,14 +20,15 @@ def _run(args):
     writer.write(downloader.article)
 
 class MultiProcessDownloader(object):
-    def __init__(self, writer):
+    def __init__(self, threads, writer):
         self._downloaders = []
         self._writer = writer
+        self._threads = threads
 
     def queue_link(self, link):
         self._downloaders.append((ArticleDownloader(link), self._writer))
 
     def process_all(self):
         # TODO Make the number of threads/processes configurable.
-        p = Pool(4)
+        p = Pool(self._threads)
         p.map(_run, self._downloaders)

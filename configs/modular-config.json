@@ -1,0 +1,10 @@
+{
+    "crawler" : "ModularCrawler",
+    "args" : {
+        "threads" : "1",
+        "output" : "File",
+        "urls" : [
+            "http://edition.cnn.com/2014/10/03/sport/motorsport/max-verstappen-youngest-f1-driver/index.html?eref=edition"
+        ]
+    }
+} 
