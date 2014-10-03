@@ -1,5 +1,5 @@
 {
-	"crwaler" : "SeveralRSSMongoCrawler",
+	"crawler" : "SeveralRSSMongoCrawler",
 	"args" : {
 		"feeds" : [
 			"http://rss.cnn.com/rss/edition.rss",

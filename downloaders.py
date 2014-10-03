@@ -29,6 +29,5 @@ class MultiProcessDownloader(object):
         self._downloaders.append((ArticleDownloader(link), self._writer))
 
     def process_all(self):
-        # TODO Make the number of threads/processes configurable.
         p = Pool(self._threads)
         p.map(_run, self._downloaders)
