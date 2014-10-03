@@ -4,10 +4,27 @@ import time
 class Article(object):
 
     def __init__(self, url):
-        article = newspaper.build_article(url)
+        self.url = url
+        self.source_domain = None
+        self.text = None
+        self.title = None
+        self.download_date = None
+        self.authors = None
+        self.category = None
+        self.keywords = None
+        self.images = None
+        self.location = None
+        self.summary = None
+        self.suggested_articles = None
+        self.meta_favicon = None
+        self.meta_lang = None
+        self.pub_date = None
+        self.parsed = False
+
+    def download_and_parse(self):
+        article = newspaper.build_article(self.url)
         article.download()
         article.parse()
-        self.url = url
         self.text = article.text
         self.title = article.title
         self.download_date = time.localtime()
@@ -17,6 +34,8 @@ class Article(object):
             self.authors = article.authors
         else:
             self.authors = None
+
+        self.source_domain = None
 
         # Not sure how to implement right now
         self.category = None
@@ -61,3 +80,5 @@ class Article(object):
             self.pub_date = article.published_date
         else:
             self.pub_date = None
+
+        self.parsed = True

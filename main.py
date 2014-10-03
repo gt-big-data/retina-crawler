@@ -1,3 +1,7 @@
+from RssFeedParser import RssLinkParser
+from downloaders import *
+from writers import *
+
 import CrawlerRunners
 import sys
 import json
@@ -6,6 +10,11 @@ import time
 
 logging.basicConfig(level=logging.INFO)
 logger = logger = logging.getLogger('retina-crawler')
+
+def find_articles(url):
+    feed_parser = RssLinkParser(url)
+    links = feed_parser.get_links()
+    return links
 
 def main():
     runner = None
@@ -25,7 +34,8 @@ def main():
             else:
                 runner = runner_type()
     except Exception, e:
-        raise
+        logger.error('Invalid config given, error is "{}"'.format(str(e)))
+        sys.exit(-1)
 
     while True:
         try:
@@ -34,7 +44,6 @@ def main():
         except Exception, e:
             logger.error(str(e))
             time.sleep(0.5)
-
 
 if __name__ == "__main__":
     main()

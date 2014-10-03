@@ -47,12 +47,12 @@ def check_and_make_dir(path):
 
 class MongoWriter():
 
-    def __init__(self, host="localhost", port=27017):
+    def __init__(self, host, port):
       self.m = pymongo.MongoClient(host, port)
-      self.db = self.m.retina
+      self.db = self.m.big_data
 
     def write(self, article):
         try:
-            self.db.CrawledArticles.insert(article)
+            self.db.articles.insert(article)
         except:
             print("Unexpected error:", sys.exc_info()[0])
