@@ -4,6 +4,7 @@ import sys
 import hashlib
 import os
 import errno
+from article import article
 from bson.objectid import ObjectId
 
 class PrintWriter(object):
@@ -54,12 +55,13 @@ class MongoWriter():
     def write(self, article, htmldata):
         try:
             htmlDict = {}
+            articleDict = article.__dict__
             original_id = ObjectId()
             htmlDict[_id] = original_id
             htmlDict[data] = htmldata
-            article[htmlKey] = original_id
+            articleDict[htmlKey] = original_id
 
-            self.db.articles.insert(article)
+            self.db.articles.insert(articleDict)
             self.db.html.insert(htmlDict)
         except:
             print("Unexpected error:", sys.exc_info()[0])
