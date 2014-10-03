@@ -3,6 +3,7 @@ import pymongo
 import sys
 import hashlib
 import os
+from bson.objectid import ObjectId
 
 class PrintWriter(object):
     """Class for writing JSON data to the screen."""
@@ -50,8 +51,15 @@ class MongoWriter():
       self.m = pymongo.MongoClient(host, port)
       self.db = self.m.big_data
 
-    def write(self, article):
+    def write(self, article, htmldata):
         try:
+            htmlDict = {}
+            original_id = ObjectId()
+            htmlDict[_id] = original_id
+            htmlDict[data] = htmldata
+            article[htmlKey] = original_id
+            
             self.db.articles.insert(article)
+            self.db.html.insert(htmlDict)
         except:
             print("Unexpected error:", sys.exc_info()[0])
