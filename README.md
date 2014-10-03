@@ -49,7 +49,7 @@ class RSSLinkPrinter(object):
         print self._rssRunner.get_new_links()
 ```
 
-Which RSS feed will this pull from? Let's say we want to test out the New York Times RSS feed. Then we should make the following configuration file, 'print-nytimes-rss-links.json'
+Which RSS feed will this pull from? Let's say we want to test out the New York Times RSS feed. Then we should make the following configuration file, `print-nytimes-rss-links.json`
 ```
 {
   "runner" : "RSSLinkPrinter",
@@ -60,3 +60,8 @@ Which RSS feed will this pull from? Let's say we want to test out the New York T
 ```
 
 The `"runner"` field in the JSON file is the name of the class you defined in `CrawlerRunners.py`, and the `args` field is a dict that will be passed directly to the constructor of your runner.
+
+So we can run the crawler with our RSSLinkPrinter with the following command:
+```
+python poc.py print-nytimes-rss-links.json
+```
