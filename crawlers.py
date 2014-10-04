@@ -128,8 +128,11 @@ class ModularCrawler(object):
         
         Return True if the crawl method should be called again. 
         """
+        # TODO: Catch any exceptions this makes.
         self._process_urls()
+        # TODO: Catch any exceptions this makes.
         self._process_feeds()
+        # TODO: Catch any exceptions this makes.
         self._downloader.process_all()
-        
-        return self._feeds not None
+
+        return self._feeds is not None

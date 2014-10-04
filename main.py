@@ -5,9 +5,6 @@ import json
 import logging
 import time
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('retina-crawler')
-
 def load_config(config_file_path):
     try:
         with open(config_file_path) as f:
@@ -34,15 +31,19 @@ def load_crawler(config):
         crawler_class = getattr(crawlers, crawler_name)
     except AttributeError:
         raise ValueError('Could not find a crawler named "%s".' % crawler_name)
-    # This may trigger one of many exceptions.
+    # This may trigger one of many ValueErrors.
     crawler = crawler_class(crawler_args)
     return crawler
 
 def main():
-    logger.info('RETINA Crawler starting..')
     if len(sys.argv) != 2:
         print "Usage: python main.py path/to/config.json"
         sys.exit(1)
+
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger('retina-crawler')
+    logger.info('RETINA Crawler starting..')
+
     try:
         config = load_config(sys.argv[1])
     except ValueError, e:
@@ -56,11 +57,13 @@ def main():
 
     logger.info('Loaded crawler "%s".' % crawler.__class__.__name__)
     logger.info("Running at %s" % time.ctime())
-    
+
     try:
         # By design, crawl() should never throw an exception.
         while crawler.crawl():
-            thread.sleep(1)
+            logger.info("Finished a round of crawling.")
+            # TODO: Track how long crawling took and make sure it doesn't run more frequently than once per minute.
+            time.sleep(1)
     except Exception, e:
         # This code should not be called and is considered a bug if it does.
         logger.exception(e)
