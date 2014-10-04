@@ -1,47 +1,88 @@
 import newspaper
-from newspaper import news_pool
+import time
 
-import json
-try:
-    import cPickle as pickle
-except:
-    import pickle
+class Article(object):
 
-def create_article(article_url):
-    article = newspaper.build_article(article_url)
-    article.download()
-    article.parse()
-    return article
+    def __init__(self, url, parser=None):
+        self.url = url
+        self.source_domain = None
+        self.text = None
+        self.title = None
+        self.download_date = None
+        self.authors = None
+        self.category = None
+        self.keywords = None
+        self.images = None
+        self.location = None
+        self.summary = None
+        self.suggested_articles = None
+        self.meta_favicon = None
+        self.meta_lang = None
+        self.pub_date = None
+        self.parsed = False
+        self._parser = parser
 
-def article_dictionary(article):
-    if (not article.is_downloaded):
+    def download_and_parse(self):
+        article = newspaper.build_article(self.url)
         article.download()
-
-    if (not article.is_parsed):
         article.parse()
+        self.text = article.text
+        self.title = article.title
+        self.download_date = time.localtime()
 
-    dict = {}
-    dict['title'] = article.title
-    dict['authors'] = article.authors
-    dict['url'] = article.url
-    dict['canonical_link'] = article.canonical_link
-    dict['images'] = article.images
-    dict['article_html'] = article.article_html
-    # additional data causes 'bson.errors.InvalidDocument' error
-    #dict['additional.additional_data'] = article.additional_data
-    dict['keywords'] = article.keywords
-    dict['imgs'] = article.imgs
-    dict['text'] = article.text
-    dict['meta_data'] = article.meta_data
-    # html causes '[Parse lxml ERR] line 880: htmlParseEntityRef: expecting ';'' error
-    # dict['html'] = article.html
-    dict['meta_description'] = article.meta_description
-    dict['meta_keywords'] = article.meta_keywords
-    dict['meta_lang'] = article.meta_lang
-    dict['meta_img'] = article.meta_img
-    return dict
+        # Optional parameters
+        if article.authors:
+            self.authors = article.authors
+        else:
+            self.authors = None
 
-def dump_article_to_json(article, filename):
-    article_dict = article_dictionary(article)
-    with open(filename, 'w') as file:
-        json.dump(article_dict, file)
+        self.source_domain = None
+
+        # Not sure how to implement right now
+        self.category = None
+
+        # Merge keywords and meta_keywords into the same param
+        self.keywords = []
+        if article.keywords:
+            self.keywords = article.keywords
+        if article.meta_keywords:
+            self.keywords = list(set(self.keywords + article.meta_keywords))
+
+        if self.keywords == ['']:
+            keywords = None
+
+        if article.images:
+            self.images = article.images
+        else:
+            self.images = None
+
+        # Will implement later
+        self.location = None
+
+        if article.summary:
+            self.summary = article.summary
+        else:
+            self.summary = None
+
+        # Not sure how to implement
+        self.suggested_articles = None
+
+        if article.meta_favicon:
+            self.meta_favicon = article.meta_favicon
+        else:
+            self.meta_favicon = None
+
+        if article.meta_lang:
+            self.meta_lang = article.meta_lang
+        else:
+            self.meta_lang = None
+
+        if article.published_date:
+            self.pub_date = article.published_date
+        else:
+            self.pub_date = None
+
+        if self._parser:
+            self._parser(self)
+
+        self.parsed = True

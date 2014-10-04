@@ -34,7 +34,7 @@ def main():
             else:
                 crawler = crawler_type()
     except Exception, e:
-        logger.error('Invalid config given, error is "{}"'.format(str(e)))
+        logger.exception('Invalid config given, error is "{}"'.format(str(e)))
         sys.exit(-1)
 
     try:

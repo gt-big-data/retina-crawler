@@ -43,9 +43,8 @@ def check_and_make_dir(path):
     '''Makes dir with given path, unless if it already exists.'''
     try:
         os.mkdir(path)
-    except OSError as exception:
-        if exception.errno != errno.EEXIST:
-            raise
+    except OSError as e:
+        pass
 
 class MongoWriter():
     def __init__(self, host, port):
