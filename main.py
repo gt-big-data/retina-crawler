@@ -9,7 +9,7 @@ import logging
 import time
 
 logging.basicConfig(level=logging.INFO)
-logger = logger = logging.getLogger('retina-crawler')
+logger = logging.getLogger('retina-crawler')
 
 def find_articles(url):
     feed_parser = RssLinkParser(url)
@@ -17,24 +17,19 @@ def find_articles(url):
     return links
 
 def main():
-    crawler = None
     logger.info('RETINA CRAWLER starting..')
     try:
         if len(sys.argv) < 2:
             crawler = crawlers.SimpleCrawler()
         else:
-            config = None
             config_file_path = sys.argv[1]
             with open(config_file_path) as f:
                 config = json.load(f)
             crawler_type = getattr(crawlers, config['crawler'])
             logger.info('loaded crawler "{}"'.format(config['crawler']))
-            if 'args' in config:
-                crawler = crawler_type(config['args'])
-            else:
-                crawler = crawler_type()
+            crawler = crawler_type(config['args'])
     except Exception, e:
-        logger.exception('Invalid config given, error is "{}"'.format(str(e)))
+        logger.exception('Invalid config given, error is "{}"'.format(e))
         sys.exit(-1)
 
     try:

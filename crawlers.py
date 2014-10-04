@@ -1,4 +1,4 @@
-from RssFeedParser import RssLinkParser, MultiRSSLinkParsers
+from RssFeedParser import RssLinkParser
 from writers import *
 import article
 from downloaders import *
@@ -12,7 +12,8 @@ class ModularCrawler(object):
             if output == "file":
                 writer = FileWriter()
             elif output == "mongo":
-                writer = MongoWriter()
+                mongo_kw_args = args['mongo_params']
+                writer = MongoWriter(**mongo_kw_args)
             elif output == "print":
                 writer = PrintWriter()
             else:
@@ -64,26 +65,3 @@ class ModularCrawler(object):
     def crawl(self):
         # process_all(), by design, is not supposed to throw any errors.
         self._downloader.process_all()
-
-class SeveralRSSMongoCrawler(object):
-    def __init__(self, config):
-        self._rssParser = MultiRSSLinkParsers(config['feeds'])
-        mongo_kw_args = config['mongo_params'] if 'mongo_params' in config else {}
-
-        self._article_writer = MongoWriter(**mongo_kw_args)
-
-    def crawl(self):
-        for link in self._rssParser.get_new_links():
-            article_info = article.create_article(link)
-            article_data = article.article_dictionary(article_info)
-            self._article_writer.write(article_data)
-
-class SimpleCrawler(object):
-    def __init__(self):
-        self._rssParser = RssLinkParser('http://rss.cnn.com/rss/edition.rss')
-
-    def crawl(self):
-        downloader = SingleThreadedDownloader(FileWriter())
-        for article in self._rssParser.get_new_articles():
-            downloader.queue_link(link)
-        downloader.process_all()

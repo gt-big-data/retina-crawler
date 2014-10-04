@@ -1,6 +1,8 @@
 {
-  "crawler" : "SeveralRSSMongoCrawler",
+  "crawler" : "ModularCrawler",
   "args" : {
+    "threads" : "0",
+    "output" : "mongo",
     "feeds" : [
       "http://rss.cnn.com/rss/edition.rss",
       "http://feeds.abcnews.com/abcnews/topstories",
@@ -13,6 +15,10 @@
       "http://feeds.feedburner.com/TechCrunch/",
       "http://podcasts.engadget.com/rss.xml",
       "http://feeds.feedburner.com/hacker-news-feed?format=xml"
-    ]
+    ],
+    "mongo_params": {
+            "host" : "localhost",
+            "port" : 27017
+    }
   }
 }

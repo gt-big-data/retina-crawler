@@ -1,8 +1,8 @@
 {
     "crawler" : "ModularCrawler",
     "args" : {
-        "threads" : "4",
-        "output" : "File",
+        "threads" : "0",
+        "output" : "file",
         "urls" : [
         ],
         "feeds" : [
