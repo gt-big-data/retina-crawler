@@ -1,33 +1,32 @@
-from article_downloader import ArticleDownloader
 from multiprocessing import Pool
 
 class SingleThreadedDownloader(object):
     def __init__(self, writer):
-        self._downloaders = []
+        self._articles = []
         self._writer = writer
 
-    def queue_link(self, link):
-        self._downloaders.append(ArticleDownloader(link))
+    def queue_article(self, article):
+        self._articles.append(article)
 
     def process_all(self):
-        for downloader in self._downloaders:
-            downloader.download_article()
-            self._writer.write(downloader.article)
+        for article in self._articles:
+            article.download_and_parse()
+            self._writer.write(article)
 
 def _run(args):
-    downloader, writer = args
-    downloader.download_article()
-    writer.write(downloader.article)
+    article, writer = args
+    article.download_and_parse()
+    writer.write(article)
 
 class MultiProcessDownloader(object):
     def __init__(self, threads, writer):
-        self._downloaders = []
+        self._articles = []
         self._writer = writer
         self._threads = threads
 
-    def queue_link(self, link):
-        self._downloaders.append((ArticleDownloader(link), self._writer))
+    def queue_article(self, article):
+        self._articles.append((article, self._writer))
 
     def process_all(self):
         p = Pool(self._threads)
-        p.map(_run, self._downloaders)
+        p.map(_run, self._articles)

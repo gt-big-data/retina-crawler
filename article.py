@@ -19,6 +19,7 @@ class Article(object):
         self.meta_favicon = None
         self.meta_lang = None
         self.pub_date = None
+        self.html = None
         self.parsed = False
         self._parser = parser
 
@@ -28,7 +29,8 @@ class Article(object):
         article.parse()
         self.text = article.text
         self.title = article.title
-        self.download_date = time.localtime()
+        self.html = article.html
+        self.download_date = int(time.time())
 
         # Optional parameters
         if article.authors:

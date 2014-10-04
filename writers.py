@@ -3,22 +3,22 @@ import pymongo
 import sys
 import hashlib
 import os
-import errno
 from article import Article
 from bson.objectid import ObjectId
 
 class PrintWriter(object):
     """Class for writing JSON data to the screen."""
+
     def __init__(self):
         pass
 
-    def write(self, json_data):
-        """Write a JSON serializable object to the screen.
+    def write(self, article):
+        """Write an Article object to the screen.
 
         Arguments:
-        json_data -- A JSON serializable object.
+        article -- A JSON-serializable article.
         """
-        print json.dumps(json_data, indent=4, ensure_ascii=False)
+        print json.dumps(article.__dict__, indent=4, ensure_ascii=False)
 
 class FileWriter(object):
     """Class for writing JSON data to a file."""
@@ -26,14 +26,14 @@ class FileWriter(object):
     def __init__(self):
         check_and_make_dir("./test_files/")
 
-    def write(self, json_data):
-        """Write a JSON serializable object to a file.
+    def write(self, article):
+        """Write an Article object to a file.
 
         Arguments:
-        json_data -- A JSON serializable object.
+        article -- A JSON-serializable article.
         """
-        filepath = "./test_files/" + hashlib.md5(json_data["title"]).hexdigest() + ".json"
-        pretty_string = json.dumps(json_data, indent=4)
+        filepath = "test_files/" + hashlib.md5(article.__dict__["title"]).hexdigest() + ".json"
+        pretty_string = json.dumps(article.__dict__, indent=4)
         with open(filepath, 'w') as output_file:
             output_file.write(pretty_string)
 
@@ -49,16 +49,22 @@ class MongoWriter():
       self.m = pymongo.MongoClient(host, port)
       self.db = self.m.big_data
 
-    def write(self, article, htmldata):
-        try:
-            htmlDict = {}
-            articleDict = article.__dict__
-            original_id = ObjectId()
-            htmlDict[_id] = original_id
-            htmlDict[data] = htmldata
-            articleDict[htmlKey] = original_id
+    def write(self, article):
+        """Write an Article object to MongoDB.
 
-            self.db.articles.insert(articleDict)
-            self.db.html.insert(htmlDict)
-        except:
-            print("Unexpected error:", sys.exc_info()[0])
+        Arguments:
+        article -- A JSON-serializable article.
+        """
+        #try:
+        html_dict = {}
+        article_dict = dict(article.__dict__)
+        del article_dict["html"]
+        original_id = ObjectId()
+        html_dict["_id"] = original_id
+        html_dict["data"] = article.html
+        article_dict["html_key"] = original_id
+
+        self.db.articles.insert(article_dict)
+        self.db.html.insert(html_dict)
+        #except:
+        #    print("Unexpected error:", sys.exc_info()[0])

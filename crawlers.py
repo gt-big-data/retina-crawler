@@ -1,64 +1,109 @@
 from RssFeedParser import RssLinkParser
 from writers import *
-import article
+from article import Article
 from downloaders import *
 import multiprocessing
 import sys
 
 class ModularCrawler(object):
-    def __init__(self, args):
+    def _get_writer(self, args):
+        """Create and return an output writer based on the given input value.
+
+        Arguments:
+        args -- The args variable given to the crawler.
+
+        Return the appropriate writer requested. Will raise an exception if something goes wrong.
+        """
         try:
             output = args["output"].lower()
-            if output == "file":
-                writer = FileWriter()
-            elif output == "mongo":
-                mongo_kw_args = args['mongo_params']
-                writer = MongoWriter(**mongo_kw_args)
-            elif output == "print":
-                writer = PrintWriter()
-            else:
-                # Make this more specific
-                raise Exception
-        except Exception, e:
-            raise e
-            sys.exit(-1)
+        except KeyError:
+            raise ValueError("Must specify an output type.")
+        except AttributeError:
+            raise ValueError("'output' must be a string.")
 
+        if output == "file":
+            return FileWriter()
+        elif output == "mongo":
+            try:
+                mongo_kw_args = args['mongo_params']
+            except KeyError:
+                raise ValueError("'mongo_params' must be specified when writing to MongoDB.")
+            try:
+                return MongoWriter(**mongo_kw_args)
+            except TypeError:
+                raise ValueError("'mongo_params' requires a host and port. The following was given: %s" % mongo_kw_args)
+        elif output == "print":
+            return PrintWriter()
+        else:
+            raise ValueError("Could not interpret the given output type: %s" % output)
+
+    def _get_threads(self, args):
+        """Determine the number of threads/processes the crawler should work with.
+
+        Arguments:
+        args -- The args variable given to the crawler.
+
+        Return an integer representing the number of processes to spawn for this crawler. Will 
+        raise an exception if something goes wrong.
+        """
         try:
             threads = int(args["threads"])
-            if threads == 0:
-                threads = multiprocessing.cpu_count()
-        except Exception, e:
-            #TODO: Add logging about bad args because threads was weird.
-            sys.exit(-1)
+        except KeyError:
+            raise ValueError("Must specify the number of threads the crawler should work with.")
+        except ValueError:
+            raise ValueError("Threads must be an integer.")
+        if threads < 0:
+            raise ValueError("Threads must be a positive integer.")
+        # 0 is interpreted as make as many threads as there are cores.
+        if threads == 0:
+            threads = multiprocessing.cpu_count()
+        return threads
 
-        try:
-            if threads == 1:
-                downloader = SingleThreadedDownloader(writer)
-            else:
-                downloader = MultiProcessDownloader(threads, writer)
-        except Exception, e:
-            # Log an error
-            sys.exit(-1)
+    def _get_downloader(self, writer, threads):
+        """Create and return a Downloader for downloading articles with.
 
+        Arguments:
+        writer -- The output writer to use.
+        threads -- The number of threads to utilize.
+        
+        Return a Downloader for downloading articles.
+        """
+        if threads == 1:
+            return SingleThreadedDownloader(writer)
+        else:
+            return MultiProcessDownloader(threads, writer)
+
+    def __init__(self, args):
+        writer = self._get_writer(args)
+        threads = self._get_threads(args)
+        downloader = self._get_downloader(writer, threads)
+        
         try:
             urls = args["urls"]
-            for url in urls:
-                downloader.queue_link(url)
-        except Exception, e:
-            #TODO: Add logging about bad config because no threads given.
-            sys.exit(-1)
+        except KeyError:
+            # Passing in individual URLs is optional.
+            pass
+        else:
+            try:
+                for url in urls:
+                    article = Article(url)
+                    downloader.queue_article(article)
+            except TypeError:
+                raise ValueError("'urls' must be a list of article URLs to process.")
 
         try:
             feeds = args["feeds"]
-            for feed in feeds:
-                feed_parser = RssLinkParser(feed)
-                for link in feed_parser.get_new_links():
-                    downloader.queue_link(link)
-        except Exception, e:
-            print e
-            raise
-            #TODO: Add logging code.
-            sys.exit(-1)
+        except KeyError:
+            # Passing in feeds is optional.
+            pass
+        else:
+            try:
+                for feed in feeds:
+                    feed_parser = RssLinkParser(feed)
+                    for article in feed_parser.get_new_articles():
+                        downloader.queue_article(article)
+            except TypeError:
+                raise ValueError("'feeds' must be a list of RSS feed URLs to process.")
 
         self._downloader = downloader
 
