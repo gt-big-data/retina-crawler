@@ -1,4 +1,4 @@
-import Article
+from article import Article
 
 class ArticleDownloader(object):
     def __init__(self, url):

@@ -1,15 +1,5 @@
 import feedparser
-from Article import Article
-
-class MultiRSSLinkParsers(object):
-    def __init__(self, rss_feed_urls):
-        self._rssLinkParsers = [RssLinkParser(feed) for feed in rss_feed_urls]
-
-    def get_new_links(self):
-        outLinks = []
-        for parser in self._rssLinkParsers:
-            outLinks.extend(parser.get_new_links())
-        return outLinks
+from article import Article
 
 class RssLinkParser(object):
     def __init__(self, rss_url):

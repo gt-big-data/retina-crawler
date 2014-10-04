@@ -4,7 +4,7 @@ import sys
 import hashlib
 import os
 import errno
-from article import article
+from article import Article
 from bson.objectid import ObjectId
 
 class PrintWriter(object):
@@ -26,8 +26,6 @@ class FileWriter(object):
     def __init__(self):
         check_and_make_dir("./test_files/")
 
-
-
     def write(self, json_data):
         """Write a JSON serializable object to a file.
 
@@ -43,7 +41,7 @@ def check_and_make_dir(path):
     '''Makes dir with given path, unless if it already exists.'''
     try:
         os.mkdir(path)
-    except OSError as e:
+    except OSError:
         pass
 
 class MongoWriter():
