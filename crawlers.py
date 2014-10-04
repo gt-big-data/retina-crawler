@@ -1,4 +1,4 @@
-from RssFeedParser import RssLinkParser
+from rss_feed_parser import RssLinkParser
 from writers import *
 from article import Article
 from downloaders import *
@@ -73,40 +73,63 @@ class ModularCrawler(object):
         else:
             return MultiProcessDownloader(threads, writer)
 
+    def _process_urls(self):
+        if self._urls is None:
+            return
+        try:
+            for url in self._urls:
+                article = Article(url)
+                self._downloader.queue_article(article)
+        except TypeError:
+            raise ValueError("'urls' must be a list of article URLs to process.")
+        finally:
+            # Regardless of it we successfully queued all of the links, we don't want to try again.
+            self._urls = None
+
+    def _process_feeds(self):
+        if self._feeds is None:
+            return
+
+        try:
+            for feed in self._feeds:
+                feed_parser = RssLinkParser(feed)
+                for article in feed_parser.get_new_articles():
+                    self._downloader.queue_article(article)
+        except TypeError:
+            raise ValueError("'feeds' must be a list of RSS feed URLs to process.")
+
     def __init__(self, args):
         writer = self._get_writer(args)
         threads = self._get_threads(args)
         downloader = self._get_downloader(writer, threads)
-        
-        try:
-            urls = args["urls"]
-        except KeyError:
-            # Passing in individual URLs is optional.
-            pass
-        else:
-            try:
-                for url in urls:
-                    article = Article(url)
-                    downloader.queue_article(article)
-            except TypeError:
-                raise ValueError("'urls' must be a list of article URLs to process.")
 
         try:
-            feeds = args["feeds"]
+            self._urls = args["urls"]
+        except KeyError:
+            # Passing in individual URLs is optional.
+            self._urls = None
+
+        try:
+            self._feeds = args["feeds"]
         except KeyError:
             # Passing in feeds is optional.
-            pass
-        else:
-            try:
-                for feed in feeds:
-                    feed_parser = RssLinkParser(feed)
-                    for article in feed_parser.get_new_articles():
-                        downloader.queue_article(article)
-            except TypeError:
-                raise ValueError("'feeds' must be a list of RSS feed URLs to process.")
+            self._feeds = None
+
+        if self._urls is None and self._feeds is None:
+            raise ValueError("No URLs or feeds were specified for processing.")
 
         self._downloader = downloader
 
     def crawl(self):
-        # process_all(), by design, is not supposed to throw any errors.
+        """Crawl all provided feeds and URLs for content.
+        
+        This method is designed to be called repeatedly. It will block until completion. It is 
+        designed to never raise exceptions.
+        
+        Return True if the crawl method should be called again. 
+        """
+        self._process_urls()
+        self._process_feeds()
         self._downloader.process_all()
+        
+        return self._feeds not None

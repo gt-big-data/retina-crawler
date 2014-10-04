@@ -10,9 +10,6 @@ class RssLinkParser(object):
         feed = feedparser.parse(self.rss_url, etag = self.etag)
         if 'etag' in feed:
             self.etag = feed.etag
-        # links = []
-        # for entry in feed.entries:
-        #     links.append(entry.link)
         articles = []
         for entry in feed.entries:
             articles.append(Article(entry.link))
