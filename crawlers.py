@@ -78,7 +78,7 @@ class ModularCrawler(object):
             return
         try:
             for url in self._urls:
-                article = Article(url)
+                article = Article.create(url)
                 self._downloader.queue_article(article)
         except TypeError:
             raise ValueError("'urls' must be a list of article URLs to process.")

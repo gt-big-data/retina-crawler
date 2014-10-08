@@ -12,5 +12,5 @@ class RssLinkParser(object):
             self.etag = feed.etag
         articles = []
         for entry in feed.entries:
-            articles.append(Article(entry.link))
+            articles.append(Article.create(entry.link))
         return articles

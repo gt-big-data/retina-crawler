@@ -56,14 +56,31 @@ class MongoWriter():
         article -- A JSON-serializable article.
         """
         #try:
-        html_dict = {}
-        article_dict = dict(article.__dict__)
-        article_dict['v'] = '0.0'
-        del article_dict["html"]
-        original_id = ObjectId()
-        html_dict["_id"] = original_id
-        html_dict["data"] = article.html
-        article_dict["html_key"] = original_id
+        html_id = ObjectId()
+        article_dict = {
+            'v' : '0.0.1',
+            'url' : article.url,
+            'source_domain' : article.source_domain,
+            'text' : article.text,
+            'title' : article.title,
+            'download_date' : article.download_date,
+            'authors' : article.authors,
+            'categories' : article.categories,
+            'keywords' : article.keywords,
+            'images' : article.images,
+            'location' : article.location,
+            'summary' : article.summary,
+            'suggested_articles' : article.suggested_articles,
+            'meta_lang' : article.meta_lang,
+            'meta_favicon' : article.meta_favicon,
+            'pub_date' : article.pub_date,
+            'html_key' : html_id,
+        }
+
+        html_dict = {
+            'id' : html_id,
+            'data' : article.html
+        }
 
         self.db.articles.insert(article_dict)
         self.db.html.insert(html_dict)

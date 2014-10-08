@@ -12,6 +12,7 @@ class SingleThreadedDownloader(object):
         for article in self._articles:
             article.download_and_parse()
             self._writer.write(article)
+        self._articles = []
 
 def _run(args):
     article, writer = args

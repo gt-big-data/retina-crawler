@@ -1,7 +1,24 @@
 import newspaper
 import time
+import parsers
+
+
+parser_lookup = [
+    ('cnn.com', parsers.parse_cnn_article), 
+]
+
+def _getParserForUrl(url):
+    for domain, parser in parser_lookup:
+        if domain in url:
+            return parser
+    return None
 
 class Article(object):
+
+    @staticmethod
+    def create(url):
+        parser = _getParserForUrl(url)
+        return Article(url, parser)
 
     def __init__(self, url, parser=None):
         self.url = url
@@ -10,7 +27,7 @@ class Article(object):
         self.title = None
         self.download_date = None
         self.authors = None
-        self.category = None
+        self.categories = None
         self.keywords = None
         self.images = None
         self.location = None
@@ -24,6 +41,9 @@ class Article(object):
         self._parser = parser
 
     def download_and_parse(self):
+        if self.parsed:
+            raise Exception('This article has already been parsed.')
+
         article = newspaper.build_article(self.url)
         article.download()
         article.parse()
@@ -51,7 +71,7 @@ class Article(object):
             self.keywords = list(set(self.keywords + article.meta_keywords))
 
         if self.keywords == ['']:
-            keywords = None
+            self.keywords = None
 
         if article.images:
             self.images = article.images
