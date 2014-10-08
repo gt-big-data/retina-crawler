@@ -58,16 +58,17 @@ def main():
     logger.info('Loaded crawler "%s".' % crawler.__class__.__name__)
     logger.info("Running at %s" % time.ctime())
 
-    try:
-        # By design, crawl() should never throw an exception.
-        while crawler.crawl():
-            logger.info("Finished a round of crawling.")
-            # TODO: Track how long crawling took and make sure it doesn't run more frequently than once per minute.
-            time.sleep(1)
-    except Exception, e:
-        # This code should not be called and is considered a bug if it does.
-        logger.exception(e)
-        sys.exit(-1)
+    while True: #TODO(): try-except properly everywhere / do a service
+        try:
+            # By design, crawl() should never throw an exception.
+            while crawler.crawl():
+                logger.info(str(time.time()) + ":Finished a round of crawling.")
+                # TODO: Track how long crawling took and make sure it doesn't run more frequently than once per minute.
+                time.sleep(1)
+        except Exception, e:
+            # This code should not be called and is considered a bug if it does.
+            logger.exception(e)
+            time.sleep(4) #TODO():
     # TODO: Handle early termination (Ctrl+C).
 
 if __name__ == "__main__":

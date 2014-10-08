@@ -58,6 +58,7 @@ class MongoWriter():
         #try:
         html_dict = {}
         article_dict = dict(article.__dict__)
+        article_dict['v'] = '0.0'
         del article_dict["html"]
         original_id = ObjectId()
         html_dict["_id"] = original_id
