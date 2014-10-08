@@ -140,7 +140,6 @@ class ModularCrawler(object):
         """
         self._process_urls()
         self._process_feeds()
-        # TODO: Catch any exceptions this makes.
         self._downloader.process_all()
 
         return self._feeds is not None

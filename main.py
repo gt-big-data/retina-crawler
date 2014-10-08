@@ -61,15 +61,22 @@ def main():
     while True: #TODO(): try-except properly everywhere / do a service
         try:
             # By design, crawl() should never throw an exception.
+            start = int(time.time())
             while crawler.crawl():
-                logger.info(str(time.time()) + ":Finished a round of crawling.")
-                # TODO: Track how long crawling took and make sure it doesn't run more frequently than once per minute.
-                time.sleep(1)
+                logger.info(str(time.ctime()) + ":Finished a round of crawling.")
+                # Track how long crawling took and make sure it doesn't run more frequently than once per minute.
+                end = int(time.time())
+                if end - start < 60:
+                    time.sleep(1)
+                else:
+                    continue
+        # Handle early termination (Ctrl+C)
+        except KeyboardInterrupt:
+            raise
         except Exception, e:
             # This code should not be called and is considered a bug if it does.
             logger.exception(e)
             time.sleep(4) #TODO():
-    # TODO: Handle early termination (Ctrl+C).
 
 if __name__ == "__main__":
     main()
