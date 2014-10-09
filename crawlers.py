@@ -1,4 +1,4 @@
-from rss_feed_parser import RssLinkParser
+from rss_feed_parser import *
 from writers import *
 from article import Article
 from downloaders import *
@@ -143,3 +143,25 @@ class ModularCrawler(object):
         self._downloader.process_all()
 
         return self._feeds is not None
+
+class SeveralRSSMongoRunner(object):
+    def __init__(self, config):
+        self._rss_parser = MultiRSSLinkParsers(config['feeds'])
+        mongo_kw_args = config['mongo_params'] if 'mongo_params' in config else {}
+        
+        self._article_writer = MongoWriter(**mongo_kw_args)
+
+    def run(self):
+        for link in self._rss_parser.get_new_links():
+            article = Article.create(link)
+            self._article_writer.write(article.to_dict())
+
+class SimpleRunner(object):
+    def __init__(self):
+        self._rssParser = RssLinkParser('http://rss.cnn.com/rss/edition.rss')
+        self._article_writer = FileWriter()
+
+    def run(self):
+        for link in self._rssParser.get_new_links():
+            article = Article.create(link)
+            self._article_writer.write(article.to_dict())
