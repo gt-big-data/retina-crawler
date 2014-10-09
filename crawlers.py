@@ -74,6 +74,10 @@ class ModularCrawler(object):
             return MultiProcessDownloader(threads, writer)
 
     def _process_urls(self):
+        """Queue all manually entered URLs for the crawler.
+
+        Running this method more than once does nothing.
+        """
         if self._urls is None:
             return
         try:
@@ -92,6 +96,7 @@ class ModularCrawler(object):
             self._urls = None
 
     def _process_feeds(self):
+        """Queue all articles found in the provided RSS feeds."""
         if self._feeds is None:
             return
 

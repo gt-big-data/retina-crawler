@@ -6,6 +6,15 @@ import logging
 import time
 
 def load_config(config_file_path):
+    """Load a JSON configuration file.
+    
+    Raise a `ValueError` if the file could not be found or read for any reason.
+    
+    Arguments:
+    config_file_path -- A path to the desired JSON file.
+    
+    Return a dictionary of key-value pairs from the config file.
+    """
     try:
         with open(config_file_path) as f:
             try:
@@ -17,6 +26,15 @@ def load_config(config_file_path):
         raise ValueError('Could not read the configuration file "%s".' % config_file_path)
 
 def load_crawler(config):
+    """Create a crawler from configuration data.
+    
+    Raise a `ValueError` if the crawler cannot be created for any reason.
+    
+    Arguments:
+    config -- A dictionary of configuration parameters for the crawler.
+    
+    Return a fully initialized crawler.
+    """
     try:
         crawler_name = config['crawler']
     except KeyError:
@@ -72,6 +90,7 @@ def main():
                     continue
         # Handle early termination (Ctrl+C)
         except KeyboardInterrupt:
+            logger.info("Terminating early by user request.")
             raise
         except Exception, e:
             # This code should not be called and is considered a bug if it does.

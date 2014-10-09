@@ -9,9 +9,6 @@ from bson.objectid import ObjectId
 class PrintWriter(object):
     """Class for writing JSON data to the screen."""
 
-    def __init__(self):
-        pass
-
     def write(self, article):
         """Write an Article object to the screen.
 
@@ -38,7 +35,11 @@ class FileWriter(object):
             output_file.write(pretty_string)
 
 def check_and_make_dir(path):
-    '''Makes dir with given path, unless if it already exists.'''
+    """Makes a directory if it doesn't already exist.
+
+    Arguments:
+    path -- The path to try creating.
+    """
     try:
         os.mkdir(path)
     except OSError:
