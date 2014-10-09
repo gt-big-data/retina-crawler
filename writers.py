@@ -16,9 +16,9 @@ class PrintWriter(object):
         """Write an Article object to the screen.
 
         Arguments:
-        article -- A JSON-serializable article.
+        article -- A JSON-serializable dictionary.
         """
-        print json.dumps(article.__dict__, indent=4, ensure_ascii=False)
+        print json.dumps(article, indent=4, ensure_ascii=False)
 
 class FileWriter(object):
     """Class for writing JSON data to a file."""
@@ -30,10 +30,10 @@ class FileWriter(object):
         """Write an Article object to a file.
 
         Arguments:
-        article -- A JSON-serializable article.
+        article -- A JSON-serializable dictionary.
         """
-        filepath = "test_files/" + hashlib.md5(article.__dict__["title"]).hexdigest() + ".json"
-        pretty_string = json.dumps(article.__dict__, indent=4)
+        filepath = "test_files/" + hashlib.md5(article["title"]).hexdigest() + ".json"
+        pretty_string = json.dumps(article, indent=4)
         with open(filepath, 'w') as output_file:
             output_file.write(pretty_string)
 
@@ -53,36 +53,8 @@ class MongoWriter():
         """Write an Article object to MongoDB.
 
         Arguments:
-        article -- A JSON-serializable article.
+        article -- A JSON-serializable dictionary.
         """
-        #try:
-        html_id = ObjectId()
-        article_dict = {
-            'v' : '0.0.1',
-            'url' : article.url,
-            'source_domain' : article.source_domain,
-            'text' : article.text,
-            'title' : article.title,
-            'download_date' : article.download_date,
-            'authors' : article.authors,
-            'categories' : article.categories,
-            'keywords' : article.keywords,
-            'images' : article.images,
-            'location' : article.location,
-            'summary' : article.summary,
-            'suggested_articles' : article.suggested_articles,
-            'meta_lang' : article.meta_lang,
-            'meta_favicon' : article.meta_favicon,
-            'pub_date' : article.pub_date,
-            'html_key' : html_id,
-        }
+        article['v'] = '0.0.2'
 
-        html_dict = {
-            'id' : html_id,
-            'data' : article.html
-        }
-
-        self.db.articles.insert(article_dict)
-        self.db.html.insert(html_dict)
-        #except:
-        #    print("Unexpected error:", sys.exc_info()[0])
+        self.db.articles.insert(article)

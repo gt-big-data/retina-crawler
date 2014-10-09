@@ -20,6 +20,10 @@ class Article(object):
         parser = _getParserForUrl(url)
         return Article(url, parser)
 
+    def to_dict(self):
+        # Return a copy of all internal public values.
+        return {k: v for k, v in self.__dict__.iteritems() if not k.startswith('_')}
+
     def __init__(self, url, parser=None):
         self.url = url
         self.source_domain = None
