@@ -78,8 +78,13 @@ class ModularCrawler(object):
             return
         try:
             for url in self._urls:
-                article = Article.create(url)
-                self._downloader.queue_article(article)
+                # makes sure urls after a bad url are still queued
+                try:
+                    article = Article.create(url)
+                    self._downloader.queue_article(article)
+                except Exception e:
+                    print(str(url) + " is bad")
+                    print(e)
         except TypeError:
             raise ValueError("'urls' must be a list of article URLs to process.")
         finally:
@@ -92,9 +97,14 @@ class ModularCrawler(object):
 
         try:
             for feed in self._feeds:
-                feed_parser = RssLinkParser(feed)
-                for article in feed_parser.get_new_articles():
-                    self._downloader.queue_article(article)
+                # all of the nested try excepts
+                try:
+                    feed_parser = RssLinkParser(feed)
+                    for article in feed_parser.get_new_articles():
+                        self._downloader.queue_article(article)
+                except Exception e:
+                    print(feed + " is bad")
+                    print(e)
         except TypeError:
             raise ValueError("'feeds' must be a list of RSS feed URLs to process.")
 
@@ -128,11 +138,8 @@ class ModularCrawler(object):
         
         Return True if the crawl method should be called again. 
         """
-        # TODO: Catch any exceptions this makes.
         self._process_urls()
-        # TODO: Catch any exceptions this makes.
         self._process_feeds()
-        # TODO: Catch any exceptions this makes.
         self._downloader.process_all()
 
         return self._feeds is not None

@@ -10,10 +10,17 @@ class SingleThreadedDownloader(object):
         self._articles.append(article)
 
     def process_all(self):
-        for article in self._articles:
-            article.download_and_parse()
-            self._writer.write(article.to_dict())
-        self._articles = []
+        try:
+            for article in self._articles:
+                try:
+                    article.download_and_parse()
+                    self._writer.write(article.to_dict())
+                except Exception e:
+                    print("bad article")
+                    print(e)
+            self._articles = []
+        except TypeError:
+            raise ValueError("'articles' must be ")
 
 def _run(article):
     article.download_and_parse()
