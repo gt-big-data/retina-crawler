@@ -82,9 +82,9 @@ class ModularCrawler(object):
                 try:
                     article = Article.create(url)
                     self._downloader.queue_article(article)
-                except Exception e:
-                    print(str(url) + " is bad")
-                    print(e)
+                except Exception, e:
+                    print str(url) + " is bad"
+                    print e
         except TypeError:
             raise ValueError("'urls' must be a list of article URLs to process.")
         finally:
@@ -102,9 +102,9 @@ class ModularCrawler(object):
                     feed_parser = RssLinkParser(feed)
                     for article in feed_parser.get_new_articles():
                         self._downloader.queue_article(article)
-                except Exception e:
-                    print(feed + " is bad")
-                    print(e)
+                except Exception, e:
+                    print feed + " is bad"
+                    print e
         except TypeError:
             raise ValueError("'feeds' must be a list of RSS feed URLs to process.")
 

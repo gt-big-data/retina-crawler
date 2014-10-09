@@ -15,9 +15,9 @@ class SingleThreadedDownloader(object):
                 try:
                     article.download_and_parse()
                     self._writer.write(article.to_dict())
-                except Exception e:
-                    print("bad article")
-                    print(e)
+                except Exception, e:
+                    print "bad article"
+                    print e
             self._articles = []
         except TypeError:
             raise ValueError("'articles' must be ")

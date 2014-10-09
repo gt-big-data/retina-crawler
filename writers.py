@@ -55,6 +55,6 @@ class MongoWriter():
         Arguments:
         article -- A JSON-serializable dictionary.
         """
-        article['v'] = '0.0.2'
+        article['v'] = '0.0.3'
 
         self.db.articles.insert(article)
