@@ -1,5 +1,6 @@
 # Ignore Python compiled files.
 *.pyc
+*.etag
 venv
 ENV
 nohup.out

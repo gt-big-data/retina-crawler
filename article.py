@@ -1,5 +1,5 @@
 import newspaper
-import time
+from datetime import datetime
 import parsers
 
 
@@ -14,11 +14,6 @@ def _getParserForUrl(url):
     return None
 
 class Article(object):
-
-    @staticmethod
-    def create(url):
-        parser = _getParserForUrl(url)
-        return Article(url, parser)
 
     def to_dict(self):
         # Return a copy of all internal public values.
@@ -41,12 +36,13 @@ class Article(object):
         self.meta_lang = None
         self.pub_date = None
         self.html = None
-        self._parsed = False
-        self._parser = parser
+
+        self.parsed = False
+        self._parser = parser or _getParserForUrl(url)
 
     def download_and_parse(self):
-        if self._parsed:
-            return
+        if self.parsed:
+            raise Exception('This article ({}) has already been parsed.'.format(self.url))
 
         article = newspaper.build_article(self.url)
         article.download()
@@ -54,7 +50,7 @@ class Article(object):
         self.text = article.text
         self.title = article.title
         self.html = article.html
-        self.download_date = int(time.time())
+        self.download_date = datetime.now()
 
         # Optional parameters
         if article.authors:
@@ -112,3 +108,17 @@ class Article(object):
             self._parser(self)
 
         self._parsed = True
+
+class RssArticle(Article):
+
+    def __init__(self, link, published_date, title, summary, parser=None):
+        super(RssArticle, self).__init__(link, parser)
+        self.rss_published_date = published_date
+        self.rss_title = title
+        self.rss_summary = summary
+
+    def download_and_parse(self):
+        super(RssArticle, self).download_and_parse()
+        self.title = self.rss_title or self.title
+        self.summary = self.rss_summary or self.summary
+        self.pub_date = self.rss_published_date or self.pub_date

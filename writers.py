@@ -46,9 +46,8 @@ def check_and_make_dir(path):
         pass
 
 class MongoWriter():
-    def __init__(self, host, port, max_pool_size):
-      self.m = pymongo.MongoClient(host, port, max_pool_size)
-      self.db = self.m.big_data
+    def __init__(self, host, port):
+      self.m = pymongo.MongoClient(host, port)
 
     def write(self, article):
         """Write an Article object to MongoDB.
@@ -57,5 +56,5 @@ class MongoWriter():
         article -- A JSON-serializable dictionary.
         """
         article['v'] = '0.0.3'
-
+        db = self.m.big_data
         self.db.articles.insert(article)

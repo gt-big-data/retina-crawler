@@ -1,4 +1,4 @@
-from rss_feed_parser import *
+from rss_feed_parser import RssFeedParser
 from writers import *
 from article import Article
 from downloaders import *
@@ -6,6 +6,29 @@ import multiprocessing
 import sys
 
 class ModularCrawler(object):
+    def __init__(self, args):
+        writer = self._get_writer(args)
+        threads = self._get_threads(args)
+        downloader = self._get_downloader(writer, threads)
+
+        try:
+            self._urls = args["urls"]
+        except KeyError:
+            # Passing in individual URLs is optional.
+            self._urls = None
+
+        try:
+            self._feeds = args["feeds"]
+            self._feed_parsers = [RssFeedParser(feed_url) for feed_url in self._feeds]
+        except KeyError:
+            # Passing in feeds is optional.
+            self._feeds = None
+
+        if self._urls is None and self._feeds is None:
+            raise ValueError("No URLs or feeds were specified for processing.")
+
+        self._downloader = downloader
+
     def _get_writer(self, args):
         """Create and return an output writer based on the given input value.
 
@@ -82,13 +105,8 @@ class ModularCrawler(object):
             return
         try:
             for url in self._urls:
-                # makes sure urls after a bad url are still queued
-                try:
-                    article = Article.create(url)
-                    self._downloader.queue_article(article)
-                except Exception, e:
-                    print str(url) + " is bad"
-                    print e
+                article = Article(url)
+                self._downloader.queue_article(article)
         except TypeError:
             raise ValueError("'urls' must be a list of article URLs to process.")
         finally:
@@ -99,7 +117,6 @@ class ModularCrawler(object):
         """Queue all articles found in the provided RSS feeds."""
         if self._feeds is None:
             return
-
         try:
             for feed in self._feeds:
                 # all of the nested try excepts
@@ -146,7 +163,6 @@ class ModularCrawler(object):
         self._process_urls()
         self._process_feeds()
         self._downloader.process_all()
-
         return self._feeds is not None
 
 class SeveralRSSMongoRunner(object):
@@ -170,3 +186,4 @@ class SimpleRunner(object):
         for link in self._rssParser.get_new_links():
             article = Article.create(link)
             self._article_writer.write(article.to_dict())
+        return self._feeds is not None
