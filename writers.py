@@ -53,8 +53,20 @@ class MongoWriter():
         """Write an Article object to MongoDB.
 
         Arguments:
-        article -- A JSON-serializable dictionary.
+        article -- An article!
         """
-        article['v'] = '0.0.3'
         db = self.m.big_data
-        self.db.articles.insert(article)
+        article_doc = article.to_dict()
+        article_doc['v'] = '0.0.5'
+        html = article_doc['html']
+        del article_doc['html']
+        html_id = ObjectId()
+        article_doc['html_id'] = html_id
+
+        html_doc = {
+            '_id' : html_id,
+            'html' : html
+        }
+
+        db.articles.insert(article_doc)
+        db.html.insert(html_doc)

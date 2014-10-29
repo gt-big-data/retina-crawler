@@ -16,7 +16,7 @@ def _getParserForUrl(url):
 class Article(object):
 
     def to_dict(self):
-        # Return a copy of all internal public values.
+        # Return a copy of all public values.
         return {k: v for k, v in self.__dict__.iteritems() if not k.startswith('_')}
 
     def __init__(self, url, parser=None):
@@ -113,12 +113,12 @@ class RssArticle(Article):
 
     def __init__(self, link, published_date, title, summary, parser=None):
         super(RssArticle, self).__init__(link, parser)
-        self.rss_published_date = published_date
-        self.rss_title = title
-        self.rss_summary = summary
+        self._rss_published_date = published_date
+        self._rss_title = title
+        self._rss_summary = summary
 
     def download_and_parse(self):
         super(RssArticle, self).download_and_parse()
-        self.title = self.rss_title or self.title
-        self.summary = self.rss_summary or self.summary
-        self.pub_date = self.rss_published_date or self.pub_date
+        self.title = self._rss_title or self.title
+        self.summary = self._rss_summary or self.summary
+        self.pub_date = self._rss_published_date or self.pub_date

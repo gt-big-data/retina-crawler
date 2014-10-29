@@ -41,7 +41,7 @@ def load_crawler(config):
         raise ValueError("Configuration must specify the name of the crawler to use.")
 
     try:
-        crawler_args = config['args']
+        crawler_args = config['args'] if 'args' in config else {}
     except KeyError:
         raise ValueError("Configuration must specify the arguments to give to the crawler.")
 
@@ -50,7 +50,10 @@ def load_crawler(config):
     except AttributeError:
         raise ValueError('Could not find a crawler named "%s".' % crawler_name)
     # This may trigger one of many ValueErrors.
-    crawler = crawler_class(crawler_args)
+    if len(crawler_args) == 0:
+        crawler = crawler_class()
+    else:
+        crawler = crawler_class(crawler_args)
     return crawler
 
 def main():
@@ -78,7 +81,6 @@ def main():
 
     while True: #TODO(): try-except properly everywhere / do a service
         try:
-            # By design, crawl() should never throw an exception.
             start = int(time.time())
             while crawler.crawl():
                 logger.info(str(time.ctime()) + ":Finished a round of crawling.")
