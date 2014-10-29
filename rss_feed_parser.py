@@ -1,8 +1,8 @@
 import feedparser
 import urlparse
 from article import RssArticle, Article
-
-embed = False
+from time import mktime
+from datetime import datetime
 
 class RssFeedParser(object):
     def __init__(self, rss_url):
@@ -35,14 +35,22 @@ class RssFeedParser(object):
             self.etag = feed.etag
         articles = []
         for entry in feed.entries:
-            if embed:
-                import IPython;IPython.embed();
             articles.append(
                 RssArticle(
                     entry.link,
-                    entry.published_parsed,
+                    datetime.fromtimestamp(mktime(entry.published_parsed)),
                     entry.title,
                     entry.summary
                 )
             )
         return articles
+
+class MultipleRSSFeedParser(object):
+    def __init__(self, feeds):
+        self._parsers = [RssFeedParser(feed) for feed in feeds]
+
+    def get_new_articles(self):
+        new_articles = []
+        for parser in self._parsers:
+            new_articles.extend(parser.get_new_articles())
+        return new_articles

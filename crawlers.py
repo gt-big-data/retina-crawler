@@ -1,9 +1,10 @@
-from rss_feed_parser import RssFeedParser
+from rss_feed_parser import RssFeedParser, MultipleRSSFeedParser
 from writers import *
 from article import Article
 from downloaders import *
 import multiprocessing
 import sys
+import random
 
 class ModularCrawler(object):
     def __init__(self, args):
@@ -121,7 +122,7 @@ class ModularCrawler(object):
             for feed in self._feeds:
                 # all of the nested try excepts
                 try:
-                    feed_parser = RssLinkParser(feed)
+                    feed_parser = RssFeedParser(feed)
                     for article in feed_parser.get_new_articles():
                         self._downloader.queue_article(article)
                 except Exception, e:
@@ -165,21 +166,27 @@ class ModularCrawler(object):
         self._downloader.process_all()
         return self._feeds is not None
 
-class SeveralRSSMongoRunner(object):
+class MultipleRSSMongoCrawler(object):
     def __init__(self, config):
-        self._rss_parser = MultiRSSLinkParsers(config['feeds'])
-        mongo_kw_args = config['mongo_params'] if 'mongo_params' in config else {}
-        
+        self._rss_parser = MultipleRSSFeedParser(config['feeds'])
+        mongo_kw_args = config['mongo_params']
         self._article_writer = MongoWriter(**mongo_kw_args)
 
-    def run(self):
-        for link in self._rss_parser.get_new_links():
-            article = Article.create(link)
-            self._article_writer.write(article.to_dict())
+    def crawl(self):
+        for article in self._rss_parser.get_new_articles():
+            article.download_and_parse()
+            self._article_writer.write(article)            
+        return True
+
+class ExplodingTestCrawler(object):
+    def crawl(self):
+        if random.random() > 0.5:
+           raise Exception(random.choice(['Bam', 'Boom', 'Kapow']))
+        return True
 
 class SimpleRunner(object):
     def __init__(self):
-        self._rssParser = RssLinkParser('http://rss.cnn.com/rss/edition.rss')
+        self._rssParser = RssFeedParser('http://rss.cnn.com/rss/edition.rss')
         self._article_writer = FileWriter()
 
     def run(self):
