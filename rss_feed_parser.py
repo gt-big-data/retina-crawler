@@ -40,9 +40,9 @@ class RssFeedParser(object):
             if link in self._already_seen:
                 raise Exception(
                     '''ERR_DUP_LINK,{link},{etag},{feed}'''.format(
-                        link,
-                        self.etag,
-                        self.rss_url
+                        link=link,
+                        etag=self.etag,
+                        feed=self.rss_url
                     )
                 )
             self._already_seen.add(link)
