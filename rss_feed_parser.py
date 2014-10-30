@@ -35,11 +35,16 @@ class RssFeedParser(object):
                     etag_file.write(feed.etag)
             self.etag = feed.etag
         articles = []
-        already_seen = []
         for entry in feed.entries:
             link = entry.link
             if link in self._already_seen:
-                raise Exception('The link "{}" has already been crawled'.format(link))
+                raise Exception(
+                    '''ERR_DUP_LINK,{link},{etag},{feed}'''.format(
+                        link,
+                        self.etag,
+                        self.rss_url
+                    )
+                )
             self._already_seen.add(link)
             articles.append(
                 RssArticle(
