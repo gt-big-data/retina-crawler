@@ -9,6 +9,7 @@ class RssFeedParser(object):
         self.etag = None
         self.rss_url = rss_url
         self.etag_filename = self._get_filename(rss_url)
+        self._already_seen = set([])
         try:
             with open(self.etag_filename) as old_etag_file:
                 etag = old_etag_file.read()
@@ -35,6 +36,16 @@ class RssFeedParser(object):
             self.etag = feed.etag
         articles = []
         for entry in feed.entries:
+            link = entry.link
+            if link in self._already_seen:
+                raise Exception(
+                    '''ERR_DUP_LINK,{link},{etag},{feed}'''.format(
+                        link,
+                        self.etag,
+                        self.rss_url
+                    )
+                )
+            self._already_seen.add(link)
             articles.append(
                 RssArticle(
                     entry.link,
