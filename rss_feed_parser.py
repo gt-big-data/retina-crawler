@@ -9,6 +9,7 @@ class RssFeedParser(object):
         self.etag = None
         self.rss_url = rss_url
         self.etag_filename = self._get_filename(rss_url)
+        self._already_seen = set([])
         try:
             with open(self.etag_filename) as old_etag_file:
                 etag = old_etag_file.read()
@@ -34,7 +35,12 @@ class RssFeedParser(object):
                     etag_file.write(feed.etag)
             self.etag = feed.etag
         articles = []
+        already_seen = []
         for entry in feed.entries:
+            link = entry.link
+            if link in self._already_seen:
+                raise Exception('The link "{}" has already been crawled'.format(link))
+            self._already_seen.add(link)
             articles.append(
                 RssArticle(
                     entry.link,
