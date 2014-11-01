@@ -56,17 +56,48 @@ class MongoWriter():
         article -- An article!
         """
         db = self.m.big_data
-        article_doc = article.to_dict()
-        article_doc['v'] = '0.0.5'
-        html = article_doc['html']
-        del article_doc['html']
+        html = article.html
         html_id = ObjectId()
-        article_doc['html_id'] = html_id
+
+        article_doc_updates = {
+            'authors' : article.authors,
+            'categories' : article.categories,
+            'images' : article.images,
+            'keywords' : article.keywords,
+            'location' : article.location,
+            'meta_favicon' : article.meta_favicon,
+            'meta_lang' : article.meta_lang,
+            'recent_download_date' : article.download_date,
+            'recent_pub_date' : article.pub_date,
+            'source_domain' : article.source_domain,
+            'suggested_articles' : article.suggested_articles,
+            'summary' : article.summary,
+            'text' : article.text,
+            'title' : article.title,
+            'url' : article.url,
+            'v' : '0.0.6'
+        }
+
+        article_doc_history = {
+            'history' : {
+                'download_date' : article.download_date,
+                'html_id' : html_id,
+                'pub_date' :  article.pub_date
+            }
+        }
 
         html_doc = {
             '_id' : html_id,
             'html' : html
         }
 
-        db.articles.insert(article_doc)
+        db.articles.update(
+            {'url' : article.url},
+            {
+                '$set' : article_doc_updates,
+                '$push' : article_doc_history,
+                '$inc' : {'history_len' : 1}
+            },
+            upsert=True
+        )
         db.html.insert(html_doc)
