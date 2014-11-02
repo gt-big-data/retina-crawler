@@ -24,7 +24,6 @@ def parse_nytimes_categories(url):
     redirect_pieces = redirect_part.replace('0A', '0')\
         .replace('0L', '')\
         .replace('0B', '.')\
-        # need the following to keep url params in same section.
         .replace('0E', '-')\
         .replace('0C0D', '?')\
         .replace('0G', '&')\
