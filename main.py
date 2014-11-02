@@ -81,13 +81,15 @@ def main():
 
     while True: #TODO(): try-except properly everywhere / do a service
         try:
-            start = int(time.time())
-            while crawler.crawl():
+            continue_crawling = True
+            while continue_crawling:
+                start = time.time()
+                continue_crawling = crawler.crawl()
                 logger.info(str(time.ctime()) + ":Finished a round of crawling.")
                 # Track how long crawling took and make sure it doesn't run more frequently than once per minute.
-                end = int(time.time())
-                if end - start < 60:
-                    time.sleep(1)
+                end = time.time()
+                if end - start < 60.0:
+                    time.sleep(15.0)
                 else:
                     continue
         # Handle early termination (Ctrl+C)
@@ -97,7 +99,7 @@ def main():
         except Exception, e:
             # This code should not be called and is considered a bug if it does.
             logger.exception(e)
-            time.sleep(4) #TODO():
+            time.sleep(5.0) #TODO():
 
 if __name__ == "__main__":
     main()

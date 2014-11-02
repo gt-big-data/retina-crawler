@@ -36,12 +36,11 @@ class Article(object):
         self.meta_lang = None
         self.pub_date = None
         self.html = None
-
-        self.parsed = False
+        self._parsed = False
         self._parser = parser or _getParserForUrl(url)
 
     def download_and_parse(self):
-        if self.parsed:
+        if self._parsed:
             raise Exception('This article ({}) has already been parsed.'.format(self.url))
 
         article = newspaper.build_article(self.url)

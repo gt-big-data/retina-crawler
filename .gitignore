@@ -1,6 +1,17 @@
 # Ignore Python compiled files.
 *.pyc
+
+# application state
 *.etag
+
+# virtualenv
 venv
 ENV
+
+# logging
 nohup.out
+*.log
+
+# IPython debugging
+*.ipynb
+.ipynb_checkpoints

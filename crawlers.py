@@ -5,6 +5,7 @@ from downloaders import *
 import multiprocessing
 import sys
 import random
+import logging
 
 class ModularCrawler(object):
     def __init__(self, args):
@@ -171,10 +172,15 @@ class MultipleRSSMongoCrawler(object):
         self._rss_parser = MultipleRSSFeedParser(config['feeds'])
         mongo_kw_args = config['mongo_params']
         self._article_writer = MongoWriter(**mongo_kw_args)
+        self._logger = logging.getLogger('retina-crawler')
 
     def crawl(self):
         for article in self._rss_parser.get_new_articles():
-            article.download_and_parse()
+            try:
+                article.download_and_parse()
+            except Exception, e:
+                self._logger.exception(e)
+                continue
             self._article_writer.write(article)            
         return True
 
