@@ -1,10 +1,11 @@
 import newspaper
 from datetime import datetime
 import parsers
+from urlparse import urlparse
 
 
 parser_lookup = [
-    ('cnn.com', parsers.parse_cnn_article), 
+    ('cnn.com', parsers.parse_cnn_article),
 ]
 
 def _getParserForUrl(url):
@@ -57,7 +58,7 @@ class Article(object):
         else:
             self.authors = None
 
-        self.source_domain = None
+        self.source_domain = urlparse(self.url).netloc
 
         # Not sure how to implement right now
         self.category = None
