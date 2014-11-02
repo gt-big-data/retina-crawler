@@ -6,6 +6,7 @@ import multiprocessing
 import sys
 import random
 import logging
+import time
 
 class ModularCrawler(object):
     def __init__(self, args):
@@ -169,13 +170,12 @@ class ModularCrawler(object):
 
 def process_article(args):
     article, mongo_kw_args = args
-
     try:
         article.download_and_parse()
         MongoWriter(**mongo_kw_args).write(article)
         return article
     except Exception, e:
-        self._logger.exception(e)
+        logging.exception(e)
         return None
 
 class MultipleRSSMongoCrawler(object):

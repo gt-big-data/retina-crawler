@@ -6,6 +6,7 @@ from urlparse import urlparse
 
 parser_lookup = [
     ('cnn.com', parsers.parse_cnn_article),
+    ('nytimes', parsers.parse_nytimes_article),
 ]
 
 def _getParserForUrl(url):
