@@ -1,0 +1,18 @@
+{
+  "crawler" : "MultipleRSSMongoCrawler",
+  "args" : {
+    "feeds" : [
+      "http://rss.cnn.com/rss/edition.rss",
+      "http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+      "http://feeds.wired.com/wired/index",
+      "http://feeds.feedburner.com/hacker-news-feed-100?format=xml",
+      "http://feeds.foxnews.com/foxnews/most-popular",
+      "http://feeds.reuters.com/reuters/topNews",
+      "https://news.ycombinator.com/rss"
+    ],
+    "mongo_params": {
+            "host" : "localhost",
+            "port" : 27017
+    }
+  }
+}

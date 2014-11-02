@@ -167,21 +167,34 @@ class ModularCrawler(object):
         self._downloader.process_all()
         return self._feeds is not None
 
+def process_article(args):
+    article, mongo_kw_args = args
+
+    try:
+        article.download_and_parse()
+        MongoWriter(**mongo_kw_args).write(article)
+        return article
+    except Exception, e:
+        self._logger.exception(e)
+        return None
+
 class MultipleRSSMongoCrawler(object):
     def __init__(self, config):
         self._rss_parser = MultipleRSSFeedParser(config['feeds'])
         mongo_kw_args = config['mongo_params']
+        self._mongo_kw_args = mongo_kw_args
         self._article_writer = MongoWriter(**mongo_kw_args)
         self._logger = logging.getLogger('retina-crawler')
+        self._pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
 
     def crawl(self):
-        for article in self._rss_parser.get_new_articles():
-            try:
-                article.download_and_parse()
-            except Exception, e:
-                self._logger.exception(e)
-                continue
-            self._article_writer.write(article)            
+        new_articles = self._rss_parser.get_new_articles()
+        if not new_articles:
+            return True
+        self._pool.map(
+            process_article,
+            [(article, self._mongo_kw_args) for article in new_articles if article]
+        )
         return True
 
 class ExplodingTestCrawler(object):
