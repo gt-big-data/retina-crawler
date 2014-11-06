@@ -1,7 +1,7 @@
 import requests
 from datetime import datetime
 import parsers
-from urlparse import urlparse
+from urlparse import urlparsefrom lxml.html.clean import clean_htmlfrom lxml.html import document_fromstring
 
 
 parser_lookup = [
@@ -43,6 +43,8 @@ class Article(object):
 
     def download_and_parse(self):
         if self._parsed:
-            raise Exception('This article ({}) has already been parsed.'.format(self.url))        # This needs a try/except.        self.html = requests.get(self.url).content        self.source_domain = urlparse(self.url).netloc        self.download_date = str(datetime.now())
-        self._parser(self)
+            raise Exception('This article ({}) has already been parsed.'.format(self.url))        try:            self.html = requests.get(self.url).content        except requests.exceptions.RequestException:            raise ValueError("Could not download the article at: %s" % self.url)        self.source_domain = urlparse(self.url).netloc        self.download_date = str(datetime.now())        #self.html = self.html.encode('utf-8')        # This alters the html in-place.
+        clean_html(self.html)
+        doc = document_fromstring(self.html)
+        self._parser(self, doc)
         self._parsed = True

@@ -29,7 +29,7 @@ class FileWriter(object):
         Arguments:
         article -- A JSON-serializable dictionary.
         """
-        filepath = "test_files/" + hashlib.md5(article["title"]).hexdigest() + ".json"
+        filepath = "test_files/" + hashlib.md5(article["title"].encode("ascii", "ignore")).hexdigest() + ".json"
         pretty_string = json.dumps(article, indent=4)
         with open(filepath, 'w') as output_file:
             output_file.write(pretty_string)
