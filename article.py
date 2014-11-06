@@ -43,8 +43,7 @@ class Article(object):
 
     def download_and_parse(self):
         if self._parsed:
-            raise Exception('This article ({}) has already been parsed.'.format(self.url))
-        # This needs a try/except.        self.html = requests.get(self.url).content        self.download_date = str(datetime.now())
+            raise Exception('This article ({}) has already been parsed.'.format(self.url))        # This needs a try/except.        self.html = requests.get(self.url).content        self.source_domain = urlparse(self.url).netloc        self.download_date = str(datetime.now())
         self._parser(self)
         self._parsed = True
 
