@@ -46,17 +46,3 @@ class Article(object):
             raise Exception('This article ({}) has already been parsed.'.format(self.url))        # This needs a try/except.        self.html = requests.get(self.url).content        self.source_domain = urlparse(self.url).netloc        self.download_date = str(datetime.now())
         self._parser(self)
         self._parsed = True
-
-class RssArticle(Article):
-
-    def __init__(self, link, published_date, title, summary, parser=None):
-        super(RssArticle, self).__init__(link, parser)
-        self._rss_published_date = published_date
-        self._rss_title = title
-        self._rss_summary = summary
-
-    def download_and_parse(self):
-        super(RssArticle, self).download_and_parse()
-        self.title = self._rss_title or self.title
-        self.summary = self._rss_summary or self.summary
-        self.pub_date = self._rss_published_date or self.pub_date

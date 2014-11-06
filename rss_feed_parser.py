@@ -1,6 +1,6 @@
 import feedparser
 import urlparse
-from article import RssArticle, Article
+from article import Article
 import time
 import logging
 from datetime import datetime
@@ -79,13 +79,7 @@ class RssFeedParser(object):
 
         new_articles = []
         for link, entry in self._filter_new(self._unique_entries_by_link(resp.entries)):
-            article = \
-                RssArticle(
-                    link,
-                    datetime.fromtimestamp(time.mktime(entry.published_parsed)),
-                    entry.title,
-                    entry.summary
-                )
+            article = Article(link)
             new_articles.append(article)
 
         logging.info('{_type},{time},{feed},{update_count},{num_entries},{new_entries}'.format(
