@@ -1,7 +1,7 @@
-from urlparse import urlparse
-import re
-
-def parse_cnn_article(article):
+from lxml import htmlfrom lxml.html.clean import clean_htmlfrom urlparse import urlparse
+def _get_favicon(doc):    return _get_data(doc, path=["link"], selector={'rel':'shortcut icon'}, field='href')[0]def _get_selector(selector):    pairs = ("@%s='%s'" % (k, v) for k,v in selector.iteritems())
+    return "[%s]" % (" and ".join(pairs))def _get_meta(doc, selector, first=True):    """Get metadata from the html.    Arguments:    doc -- The HTML element to grab metadata from.    first -- True if the first result should be automatically returned.    selector -- A dictionary of html selectors.    Examples:    _get_meta(doc, {'name':'news_keywords'})    _get_meta(doc, {'property':'article:modified'})    Return a list of all elements that match the selectors or just the first one.    """    result = _get_data(doc, path=["meta"], selector=selector, field="content")    if first:        return result[0]    else:        return resultdef _get_data(doc, path=[], selector=None, field=None):    """    Get all Elements at the given path.    Arguments:    doc -- The HTML element to extract data from.    path -- A list of the path components to the desired element.    Examples:    _get_data(doc, ["body", "article", "p"])    Return a list of all elements that match the path.    """    path_text = "//%s" % "//".join(path)    if selector is not None:        selector_text = _get_selector(selector)    else:        selector_text = ""    if field is not None:        field_text = "/@%s" % field    else:        field_text = ""        return doc.xpath("%s%s%s" % (path_text, selector_text, field_text))
+def parse_cnn_article(article, newspaper_article):
     parsed_url = urlparse(article.url)
 
     #the "edition" subdomain is not relevant in this case
@@ -10,31 +10,5 @@ def parse_cnn_article(article):
     #these locations in the path represent categories
     article.categories = parsed_url.path.split("/")[4:-1]
 
-YEAR_REGEXP = re.compile('^20([1-9]){2}$')
-
-def parse_nytimes_categories(url):
-    '''
-    URLs have a "redirect" part of the path, which is 2nd to last in the path
-    (last is /story.htm). The redirect part consists of
-    nytimes / YYYY / MM / DD / category / article-name (if has category)
-    OR
-    subdomain.nytimes / YYYY / MM / DD / article-name (if this is a "blog" article)
-    '''
-    redirect_part = urlparse(url).path.split('/')[-2]
-    redirect_pieces = redirect_part.replace('0A', '0')\
-        .replace('0L', '')\
-        .replace('0B', '.')\
-        .replace('0E', '-')\
-        .replace('0C0D', '?')\
-        .replace('0G', '&')\
-        .replace('0F', '=')\
-        .replace('0C', '/')\
-        .split('/')
-
-    for i, word in enumerate(redirect_pieces):
-        if YEAR_REGEXP.match(word) and i + 3 < len(redirect_pieces) - 1:
-            return [redirect_pieces[i + 3]]
-    return None
-
-def parse_nytimes_article(article):
-    article.categories = parse_nytimes_categories(article.url)
+def parse_nytimes_article(article):    # This alters the html in-place.    clean_html(article.html)    doc = html.document_fromstring(article.html)    text = _get_data(doc, ["body", "article", "p"])    text = "\n".join(t.text for t in text if t.text is not None)    article.text = text    article.title = _get_meta(doc, {'property': 'og:title'})    keywords = _get_meta(doc, {'name': "news_keywords"})    article.keywords = keywords.split(';')    article.pub_date = _get_meta(doc, {'property': 'article:modified'})    article.authors = _get_meta(doc, {'name': 'author'}, first=False)    #Not always present    try:        article.location = _get_meta(doc, {'name': 'geo'})    except:        article.location = None    article.summary = _get_meta(doc, {'itemprop': 'description'})    article.meta_favicon = _get_favicon(doc)    article.meta_lang = _get_meta(doc, {'itemprop': 'inLanguage'})
+    #TODO: Get title image out of the article.    #TODO: Get suggested articles out of the article.
