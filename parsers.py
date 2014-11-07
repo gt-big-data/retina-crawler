@@ -5,8 +5,7 @@ def parse_cnn_article(article, doc):    if _get_meta(doc, {'name': 'medium'}) =
 
 def parse_nytimes_article(article, doc):    if _get_meta(doc, {'name': 'CG'}) == "Video":
         raise NotImplementedError("Cannot parse a video article.")    text = _get_data(doc, ["body", "article", "p"])    text = u"\n".join(t.text for t in text if t.text is not None)    article.text = text    article.title = _get_meta(doc, {'property': 'og:title'})    keywords = _get_meta(doc, {'name': "news_keywords"})    article.keywords = keywords.split(';')    article.pub_date = _get_meta(doc, {'property': 'article:modified'})    article.authors = _get_meta(doc, {'name': 'author'}, first=False)    #Not always present    try:        article.location = _get_meta(doc, {'name': 'geo'})    except:        article.location = None    article.summary = _get_meta(doc, {'itemprop': 'description'})    article.meta_favicon = _get_favicon(doc)    article.meta_lang = _get_meta(doc, {'itemprop': 'inLanguage'})    article.categories = [_get_meta(doc, {'itemprop': 'articleSection'})]
-    #TODO: Get title image out of the article.    #TODO: Get suggested articles out of the article.def newspaper_parser(article):    newspaper_article = newspaper.build_article(article.url)
-    newspaper_article.download()
+    #TODO: Get title image out of the article.    #TODO: Get suggested articles out of the article.def newspaper_parser(article):    newspaper_article = newspaper.build_article(article.url)    newspaper_article.set_html(article.html)
     newspaper_article.parse()
     article.text = newspaper_article.text
     article.title = newspaper_article.title

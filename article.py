@@ -43,10 +43,8 @@ class Article(object):
 
     def download_and_parse(self):
         if self._parsed:
-            raise Exception('This article ({}) has already been parsed.'.format(self.url))        self.download_date = datetime.now()        self.source_domain = urlparse(self.url).netloc        self._parsed = True        if (self._parser == parsers.newspaper_parser):            self._parser(self)        else:            try:
-                self.html = requests.get(self.url).content
-            except requests.exceptions.RequestException:
-                raise ValueError("Could not download the article at: %s" % self.url)            # This alters the html in-place.
-            clean_html(self.html)
-            doc = document_fromstring(self.html)
-            self._parser(self, doc)
+            raise Exception('This article ({}) has already been parsed.'.format(self.url))        self.download_date = datetime.now()        self.source_domain = urlparse(self.url).netloc        self._parsed = True        try:
+            self.html = requests.get(self.url).content
+        except requests.exceptions.RequestException:
+            raise IOError("Could not download the article at: %s" % self.url)        # This alters the html in-place.        clean_html(self.html)        if (self._parser == parsers.newspaper_parser):            self._parser(self)        else:            doc = document_fromstring(self.html)
+            self._parser(self, doc)

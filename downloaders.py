@@ -26,7 +26,7 @@ class SingleThreadedDownloader(object):
         for article in self._articles:
             try:
                 article.download_and_parse()
-                self._writer.write(article.to_dict())            except NotImplementedError:                # We must of encountered a video article - just skip over it.                print "Encountered an unparsable article: %s" % article.url            except ValueError, e:                print "Could not parse the article: %s\nReason: %s" % (article.url, e)
+                self._writer.write(article.to_dict())            except NotImplementedError:                # We must of encountered a video article - just skip over it.                print "Encountered an unparsable article: %s" % article.url            except IOError:                print "Could not download the following article: %s\nReason: %s" % (article.url, e)            except ValueError, e:                print "Could not parse the article: %s\nReason: %s" % (article.url, e)
             except Exception, e:
                 print "An unspecified error occurred while processing %s. %s" % (article.url, e)
         # Clear the queue when we finish.
