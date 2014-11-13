@@ -14,7 +14,8 @@ class PrintWriter(object):
 
         Arguments:
         article -- A JSON-serializable dictionary.
-        """
+        """        # Cannot JSON serialize a datetime object.
+        article["download_date"] = str(article["download_date"])
         print json.dumps(article, indent=4, ensure_ascii=False)
 
 class FileWriter(object):
@@ -28,8 +29,8 @@ class FileWriter(object):
 
         Arguments:
         article -- A JSON-serializable dictionary.
-        """
-        filepath = "test_files/" + hashlib.md5(article["title"]).hexdigest() + ".json"
+        """        # Cannot JSON serialize a datetime object.        article["download_date"] = str(article["download_date"])
+        filepath = "test_files/" + hashlib.md5(article["title"].encode("ascii", "ignore")).hexdigest() + ".json"
         pretty_string = json.dumps(article, indent=4)
         with open(filepath, 'w') as output_file:
             output_file.write(pretty_string)

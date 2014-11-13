@@ -1,7 +1,7 @@
-import newspaper
+import requests
 from datetime import datetime
 import parsers
-from urlparse import urlparse
+from urlparse import urlparsefrom lxml.html.clean import clean_htmlfrom lxml.html import document_fromstring
 
 
 parser_lookup = [
@@ -13,7 +13,7 @@ def _getParserForUrl(url):
     for domain, parser in parser_lookup:
         if domain in url:
             return parser
-    return None
+    return parsers.newspaper_parser
 
 class Article(object):
 
@@ -43,83 +43,8 @@ class Article(object):
 
     def download_and_parse(self):
         if self._parsed:
-            raise Exception('This article ({}) has already been parsed.'.format(self.url))
-
-        article = newspaper.build_article(self.url)
-        article.download()
-        article.parse()
-        self.text = article.text
-        self.title = article.title
-        self.html = article.html
-        self.download_date = datetime.now()
-
-        # Optional parameters
-        if article.authors:
-            self.authors = article.authors
-        else:
-            self.authors = None
-
-        self.source_domain = urlparse(self.url).netloc
-
-        # Not sure how to implement right now
-        self.category = None
-
-        # Merge keywords and meta_keywords into the same param
-        self.keywords = []
-        if article.keywords:
-            self.keywords = article.keywords
-        if article.meta_keywords:
-            self.keywords = list(set(self.keywords + article.meta_keywords))
-
-        if self.keywords == ['']:
-            self.keywords = None
-
-        if article.images:
-            self.images = article.images
-        else:
-            self.images = None
-
-        # Will implement later
-        self.location = None
-
-        if article.summary:
-            self.summary = article.summary
-        else:
-            self.summary = None
-
-        # Not sure how to implement
-        self.suggested_articles = None
-
-        if article.meta_favicon:
-            self.meta_favicon = article.meta_favicon
-        else:
-            self.meta_favicon = None
-
-        if article.meta_lang:
-            self.meta_lang = article.meta_lang
-        else:
-            self.meta_lang = None
-
-        if article.published_date:
-            self.pub_date = article.published_date
-        else:
-            self.pub_date = None
-
-        if self._parser:
-            self._parser(self)
-
-        self._parsed = True
-
-class RssArticle(Article):
-
-    def __init__(self, link, published_date, title, summary, parser=None):
-        super(RssArticle, self).__init__(link, parser)
-        self._rss_published_date = published_date
-        self._rss_title = title
-        self._rss_summary = summary
-
-    def download_and_parse(self):
-        super(RssArticle, self).download_and_parse()
-        self.title = self._rss_title or self.title
-        self.summary = self._rss_summary or self.summary
-        self.pub_date = self._rss_published_date or self.pub_date
+            raise Exception('This article ({}) has already been parsed.'.format(self.url))        self.download_date = datetime.now()        self.source_domain = urlparse(self.url).netloc        self._parsed = True        try:
+            self.html = requests.get(self.url).content
+        except requests.exceptions.RequestException:
+            raise IOError("Could not download the article at: %s" % self.url)        # This alters the html in-place.        clean_html(self.html)        if (self._parser == parsers.newspaper_parser):            self._parser(self)        else:            doc = document_fromstring(self.html)
+            self._parser(self, doc)
