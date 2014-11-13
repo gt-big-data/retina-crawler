@@ -76,7 +76,7 @@ class MongoWriter():
             'text' : article.text,
             'title' : article.title,
             'url' : article.url,
-            'v' : '0.0.6'
+            'v' : '0.0.7'
         }
 
         article_doc_history = {
