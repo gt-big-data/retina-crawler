@@ -5,7 +5,7 @@ import hashlib
 import os
 from article import Article
 from bson.objectid import ObjectId
-
+DB_VERSION = '0.0.7'
 class PrintWriter(object):
     """Class for writing JSON data to the screen."""
 
@@ -29,11 +29,11 @@ class FileWriter(object):
 
         Arguments:
         article -- A JSON-serializable dictionary.
-        """        # Cannot JSON serialize a datetime object.        article["download_date"] = str(article["download_date"])
-        filepath = "test_files/" + hashlib.md5(article["title"].encode("ascii", "ignore")).hexdigest() + ".json"
-        pretty_string = json.dumps(article, indent=4)
-        with open(filepath, 'w') as output_file:
-            output_file.write(pretty_string)
+        """        # Cannot JSON serialize a datetime object.        article["download_date"] = str(article["download_date"])        try:
+            filepath = "test_files/" + hashlib.md5(article["title"].encode("ascii", "ignore")).hexdigest() + ".json"
+            pretty_string = json.dumps(article, indent=4)
+            with open(filepath, 'w') as output_file:
+                output_file.write(pretty_string)        except:            print article["title"]            raise
 
 def check_and_make_dir(path):
     """Makes a directory if it doesn't already exist.
@@ -76,7 +76,7 @@ class MongoWriter():
             'text' : article.text,
             'title' : article.title,
             'url' : article.url,
-            'v' : '0.0.7'
+            'v' : DB_VERSION
         }
 
         article_doc_history = {

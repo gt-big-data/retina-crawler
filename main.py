@@ -1,4 +1,4 @@
-import crawlers
+import crawlersfrom writers import DB_VERSION
 
 import sys
 import json
@@ -77,7 +77,7 @@ def main():
         sys.exit(-1)
 
     logger.info('Loaded crawler "%s".' % crawler.__class__.__name__)
-    logger.info("Running at %s" % time.ctime())
+    logger.info("Running at %s" % time.ctime())    logger.info("Writing with DB version: %s" % DB_VERSION)
 
     while True: #TODO(): try-except properly everywhere / do a service
         try:
@@ -95,11 +95,11 @@ def main():
         # Handle early termination (Ctrl+C)
         except KeyboardInterrupt:
             logger.info("Terminating early by user request.")
-            raise
+            sys.exit(1)
         except Exception, e:
             # This code should not be called and is considered a bug if it does.
             logger.exception(e)
-            time.sleep(5.0) #TODO():
+            time.sleep(5.0) #TODO():    logger.critical("WE ESCAPED THE WHILE(TRUE) LOOP!!! What happened!?!?")
 
 if __name__ == "__main__":
     main()
