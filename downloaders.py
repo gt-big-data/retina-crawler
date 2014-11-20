@@ -23,12 +23,8 @@ class SingleThreadedDownloader(object):
 
     def process_all(self):
         """Download, scrape, and print all queued articles."""
-        for article in self._articles:
-            try:
-                article.download_and_parse()
-                self._writer.write(article.to_dict())            except NotImplementedError:                # We must of encountered a video article - just skip over it.                logging.warning("Encountered an unparsable article: %s" % article.url)            except IOError:                logger.error("Could not download the following article: %s\nReason: %s" % (article.url, e))            except ValueError, e:                logging.error("Could not parse the article: %s\nReason: %s" % (article.url, e))
-            except Exception, e:
-                logging.exception("An unspecified error occurred while processing the URL: %s" % article.url)
+        for article in self._articles:            article_dict = _run(article)            if article_dict is not None:                self._writer.write(article_dict)
+
         # Clear the queue when we finish.
         self._articles = []
 
@@ -41,9 +37,17 @@ def _run(article):
     article -- The article to process.
 
     Return a JSON serializable dictionary of the article's data.
-    """
-    article.download_and_parse()
-    return article.to_dict()
+    """    try:
+        article.download_and_parse()        return article.to_dict()
+    except NotImplementedError:
+        # We must of encountered a video article - just skip over it.
+        logging.warning("Encountered an unparsable article: %s" % article.url)
+    except IOError:
+        logger.error("Could not download the following article: %s\nReason: %s" % (article.url, e))
+    except ValueError, e:
+        logging.error("Could not parse the article: %s\nReason: %s" % (article.url, e))
+    except Exception, e:
+        logging.exception("An unspecified error occurred while processing the URL: %s" % article.url)    return None
 
 class MultiProcessDownloader(object):
     def __init__(self, threads, writer):
@@ -64,8 +68,8 @@ class MultiProcessDownloader(object):
         
         Arguments:
         article -- A dictionary to output
-        """
-        self._writer.write(article)
+        """        if article is not None:
+            self._writer.write(article)
     
     def process_all(self):
         """Download, scrape, and print all queued articles."""
