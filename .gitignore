@@ -19,3 +19,6 @@ nohup.out
 # IntelliJ files
 .idea/
 *.iml
+
+# Vagrant
+.vagrant/

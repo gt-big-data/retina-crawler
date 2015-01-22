@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+apt-get update
+apt-get install -y libxml2 libxslt1-dev python-pip mongodb python-dev zlib1g-dev
+
+pip install -r /vagrant/deploy/requirements.txt
