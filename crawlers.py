@@ -69,7 +69,7 @@ class ModularCrawler(object):
         Arguments:
         args -- The args variable given to the crawler.
 
-        Return an integer representing the number of processes to spawn for this crawler. Will 
+        Return an integer representing the number of processes to spawn for this crawler. Will
         raise an exception if something goes wrong.
         """
         try:
@@ -91,7 +91,7 @@ class ModularCrawler(object):
         Arguments:
         writer -- The output writer to use.
         threads -- The number of threads to utilize.
-        
+
         Return a Downloader for downloading articles.
         """
         if threads == 1:
@@ -157,11 +157,11 @@ class ModularCrawler(object):
 
     def crawl(self):
         """Crawl all provided feeds and URLs for content.
-        
-        This method is designed to be called repeatedly. It will block until completion. It is 
+
+        This method is designed to be called repeatedly. It will block until completion. It is
         designed to never raise exceptions.
-        
-        Return True if the crawl method should be called again. 
+
+        Return True if the crawl method should be called again.
         """
         self._process_urls()
         self._process_feeds()

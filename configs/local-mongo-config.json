@@ -6,8 +6,8 @@
       "http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml"
     ],
     "mongo_params": {
-            "host" : "localhost",
-            "port" : 27017
+      "host" : "localhost",
+      "port" : 27017
     }
   }
 }

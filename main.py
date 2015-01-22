@@ -1,4 +1,5 @@
-import crawlersfrom writers import DB_VERSION
+import crawlers
+from writers import DB_VERSION
 
 import sys
 import json
@@ -7,12 +8,12 @@ import time
 
 def load_config(config_file_path):
     """Load a JSON configuration file.
-    
+
     Raise a `ValueError` if the file could not be found or read for any reason.
-    
+
     Arguments:
     config_file_path -- A path to the desired JSON file.
-    
+
     Return a dictionary of key-value pairs from the config file.
     """
     try:
@@ -27,12 +28,12 @@ def load_config(config_file_path):
 
 def load_crawler(config):
     """Create a crawler from configuration data.
-    
+
     Raise a `ValueError` if the crawler cannot be created for any reason.
-    
+
     Arguments:
     config -- A dictionary of configuration parameters for the crawler.
-    
+
     Return a fully initialized crawler.
     """
     try:
@@ -77,7 +78,8 @@ def main():
         sys.exit(-1)
 
     logger.info('Loaded crawler "%s".' % crawler.__class__.__name__)
-    logger.info("Running at %s" % time.ctime())    logger.info("Writing with DB version: %s" % DB_VERSION)
+    logger.info("Running at %s" % time.ctime())
+    logger.info("Writing with DB version: %s" % DB_VERSION)
 
     while True: #TODO(): try-except properly everywhere / do a service
         try:
@@ -99,7 +101,8 @@ def main():
         except Exception, e:
             # This code should not be called and is considered a bug if it does.
             logger.exception(e)
-            time.sleep(5.0) #TODO():    logger.critical("WE ESCAPED THE WHILE(TRUE) LOOP!!! What happened!?!?")
+            time.sleep(5.0) #TODO():
+    logger.critical("WE ESCAPED THE WHILE(TRUE) LOOP!!! What happened!?!?")
 
 if __name__ == "__main__":
     main()

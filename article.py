@@ -40,4 +40,8 @@ class Article(object):
         try:
             self.html = requests.get(self.url).content
         except requests.exceptions.RequestException:
-            raise IOError("Could not download the article at: %s" % self.url)        # This alters the html in-place.        clean_html(self.html)        doc = document_fromstring(self.html)        parsers.parse_article(self, doc)
+            raise IOError("Could not download the article at: %s" % self.url)
+        # This alters the html in-place.
+        clean_html(self.html)
+        doc = document_fromstring(self.html)
+        parsers.parse_article(self, doc)

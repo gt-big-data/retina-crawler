@@ -8,4 +8,5 @@ nltk==3.0.0
 pymongo==2.7.2
 requests==2.4.1
 wsgiref==0.1.2
-futures==2.2.0opengraph==0.5
+futures==2.2.0
+opengraph==0.5
