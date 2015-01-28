@@ -38,6 +38,8 @@ class Article(object):
         self.source_domain = urlparse(self.url).netloc
         self._parsed = True
         try:
-            self.html = requests.get(self.url).content
+            response = requests.get(self.url)
+            self.html = response.content
+            self.url = response.url # Deals with redirects.
         except requests.exceptions.RequestException:
             raise IOError("Could not download the article at: %s" % self.url)        # This alters the html in-place.        clean_html(self.html)        doc = document_fromstring(self.html)        parsers.parse_article(self, doc)
