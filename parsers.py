@@ -2,8 +2,6 @@ from datetime import date
 from urlparse import urlparse
 import newspaper
 from opengraph import OpenGraph
-from BeautifulSoup import BeautifulSoup as BS
-import re
 
 def _sanity_check(article):
     """Check that all required fields in the article have been filled in.
@@ -91,15 +89,6 @@ def _get_data(doc, path=[], selector=None, field=None, first=False):
     except Exception:
         return None
 
-def _get_out_links(article):
-    #Need to add base url to cnn stuff, and needs to focus on only relevent links
-    soup = BS(article.html)
-    for link in soup.findAll('a'):
-        print(link.get('href'))
-        article.out_links.append(link.get('href'))
-
-
-
 def _parse_schema_org(article, doc):
     if _get_meta(doc, {'name': 'medium'}) == "video":
         raise NotImplementedError("Cannot parse a video article.")
@@ -169,11 +158,9 @@ def _parse_extra(article, doc):
     #TODO: Get title image out of the article.
     #TODO: Get suggested articles out of the article.
 
-
 def parse_article(article, doc):
     # Each parser will only update fields if there is no data already.
     # Note that the final newspaper parser is the only one that finds text.
-    _get_out_links(article)
     _parse_open_graph(article)
     _parse_schema_org(article, doc)
     _parse_newspaper(article)

@@ -29,7 +29,6 @@ class Article(object):
         self.pub_date = None
         self.html = None
         self._parsed = False
-        self.out_links = []
 
     def download_and_parse(self):
         if self._parsed:
