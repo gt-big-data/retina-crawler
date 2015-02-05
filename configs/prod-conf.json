@@ -1,6 +1,8 @@
 {
-    "crawler" : "MultipleRSSMongoCrawler",
+    "crawler" : "ModularCrawler",
     "args" : {
+        "threads" : "0",
+        "output" : "mongo",
         "feeds" : [
             "http://rss.cnn.com/rss/edition.rss",
             "http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml",
@@ -11,7 +13,8 @@
         ],
         "mongo_params": {
             "host" : "146.148.59.202",
-            "port" : 27017
+            "port" : 27017,
+            "max_pool_size": 50
         }
     }
 }
