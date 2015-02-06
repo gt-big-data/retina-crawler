@@ -3,6 +3,26 @@ from urlparse import urlparse
 import newspaper
 from opengraph import OpenGraph
 
+def good(obj):
+    """Determine if a value has good data.
+
+    Consider this an extension of a value's boolean property.
+
+    Arguments:
+    obj -- The object to determine if it is really a True or False value.
+    """
+    if not obj:
+        return False
+
+    try:
+        for value in obj:
+            if not value:
+                return False
+    except TypeError:
+        pass
+
+    return obj
+
 def _sanity_check(article):
     """Check that all required fields in the article have been filled in.
 
@@ -93,15 +113,15 @@ def _parse_schema_org(article, doc):
     if _get_meta(doc, {'name': 'medium'}) == "video":
         raise NotImplementedError("Cannot parse a video article.")
 
-    article.title = article.title or _get_meta(doc, {'itemprop': 'headline'})
-    article.categories = article.categories or [_get_meta(doc, {'itemprop': 'articleSection'})]
+    article.title = good(article.title) or _get_meta(doc, {'itemprop': 'headline'})
+    article.categories = good(article.categories) or [_get_meta(doc, {'itemprop': 'articleSection'})]
     # Sub categories would be nice, but are a bit difficult to grab right now.
     #article.categories.extend(_get_meta(doc, {'itemprop': 'subsection'}, first=False))
-    article.pub_date = article.pub_date or _get_meta(doc, {'itemprop': 'dateModified'})
-    article.authors = article.authors or [_get_meta(doc, {'itemprop': 'author'})]
-    article.location = article.location or _get_meta(doc, {'itemprop': 'contentLocation'})
-    article.summary = article.summary or _get_meta(doc, {'itemprop': 'description'})
-    article.meta_lang = article.meta_lang or _get_meta(doc, {'itemprop': 'inLanguage'})
+    article.pub_date = good(article.pub_date) or _get_meta(doc, {'itemprop': 'dateModified'})
+    article.authors = good(article.authors) or [_get_meta(doc, {'itemprop': 'author'})]
+    article.location = good(article.location) or _get_meta(doc, {'itemprop': 'contentLocation'})
+    article.summary = good(article.summary) or _get_meta(doc, {'itemprop': 'description'})
+    article.meta_lang = good(article.meta_lang) or _get_meta(doc, {'itemprop': 'inLanguage'})
 
 def _parse_open_graph(article):
     og = OpenGraph(html=article.html)
@@ -113,44 +133,53 @@ def _parse_open_graph(article):
 
     og.setdefault(None)
 
-    article.title = article.title or og.get("title")
-    article.summary = article.summary or og.get("description")
-    article.images = article.images or [og.get("image")]
-    article.meta_lang = article.meta_lang or og.get("locale")
-    article.keywords = article.keywords or og.get("tag")
-    article.categories = article.categories or [og.get("category")]
-    article.authors = article.authors or [og.get("author")]
-    article.pub_date = article.pub_date or og.get("modified_date")
+    article.title = good(article.title) or og.get("title")
+    article.summary = good(article.summary) or og.get("description")
+    article.images = good(article.images) or [og.get("image")]
+    article.meta_lang = good(article.meta_lang) or og.get("locale")
+    article.keywords = good(article.keywords) or og.get("tag")
+    article.categories = good(article.categories) or [og.get("category")]
+    article.authors = good(article.authors) or [og.get("author")]
+    article.pub_date = good(article.pub_date) or og.get("modified_date")
 
 def _parse_newspaper(article):
     newspaper_article = newspaper.build_article(article.url)
     newspaper_article.set_html(article.html)
     newspaper_article.parse()
-    article.text = article.text or newspaper_article.text
-    article.title = article.title or newspaper_article.title
-    article.authors = article.authors or newspaper_article.authors
-    if not article.keywords:
+    article.text = good(article.text) or newspaper_article.text
+    article.title = good(article.title) or newspaper_article.title
+    article.authors = good(article.authors) or newspaper_article.authors
+    if not good(article.keywords):
         keywords = newspaper_article.keywords or []
         other_keywords = newspaper_article.meta_keywords or []
         article.keywords = list(set(keywords + other_keywords))
-    article.images = article.images or newspaper_article.images
-    article.summary = article.summary or newspaper_article.summary
-    article.meta_favicon = article.meta_favicon or newspaper_article.meta_favicon
-    article.meta_lang = article.meta_lang or newspaper_article.meta_lang
-    article.pub_date = article.pub_date or newspaper_article.published_date
+    article.images = good(article.images) or newspaper_article.images
+    article.summary = good(article.summary) or newspaper_article.summary
+    article.meta_favicon = good(article.meta_favicon) or newspaper_article.meta_favicon
+    article.meta_lang = good(article.meta_lang) or newspaper_article.meta_lang
+    article.pub_date = good(article.pub_date) or newspaper_article.published_date
+
+def _extract_category(article):
+    if good(article.categories):
+        return
+    for part in article.url.split("/")[3:]: # Ignore http://example.com/
+        if part and not part.isdigit():
+            article.categories = [part]
+            return
 
 def _parse_extra(article, doc):
-    article.meta_favicon = article.meta_favicon or article.source_domain + "/favicon.ico"
-    article.keywords = article.keywords or article.categories
-    article.pub_date = article.pub_date or _get_data(doc, path=[".//time"], field="datetime", first=True)
+    article.meta_favicon = good(article.meta_favicon) or article.source_domain + "/favicon.ico"
+    article.keywords = good(article.keywords) or article.categories
+    article.pub_date = good(article.pub_date) or _get_data(doc, path=[".//time"], field="datetime", first=True)
+    _extract_category(article)
 
     # If all else fails, get the published day (not time) from the URL.
     try:
         year = date.today().year
         pieces = article.url.split("/%d/" % year)[1].split("/")
         month = pieces[0]
-        day = pieces[0]
-        article.pub_date = article.pub_date or "%d-%s-%s" % (year, month, day)
+        day = pieces[1]
+        article.pub_date = good(article.pub_date) or "%d-%s-%s" % (year, month, day)
     except Exception:
         # I give up - Take the download date.
         article.pub_date = str(article.pub_date or article.download_date)
