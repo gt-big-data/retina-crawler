@@ -159,10 +159,19 @@ def _parse_newspaper(article):
     article.meta_lang = good(article.meta_lang) or newspaper_article.meta_lang
     article.pub_date = good(article.pub_date) or newspaper_article.published_date
 
+def _extract_category(article):
+    if good(article.categories):
+        return
+    for part in article.url.split("/")[3:]: # Ignore http://example.com/
+        if part and not part.isdigit():
+            article.categories = [part]
+            return
+
 def _parse_extra(article, doc):
     article.meta_favicon = good(article.meta_favicon) or article.source_domain + "/favicon.ico"
     article.keywords = good(article.keywords) or article.categories
     article.pub_date = good(article.pub_date) or _get_data(doc, path=[".//time"], field="datetime", first=True)
+    _extract_category(article)
 
     # If all else fails, get the published day (not time) from the URL.
     try:
