@@ -13,8 +13,7 @@
         ],
         "mongo_params": {
             "host" : "localhost",
-            "port" : 27017,
-            "max_pool_size": 50
+            "port" : 27017
         }
     }
 }

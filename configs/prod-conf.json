@@ -13,8 +13,7 @@
         ],
         "mongo_params": {
             "host" : "146.148.59.202",
-            "port" : 27017,
-            "max_pool_size": 50
+            "port" : 27017
         }
     }
 }
