@@ -28,3 +28,10 @@ python main.py configs/simple-config.json
 This will run the crawler with the simplest possible setup. It will crawl articles from the main CNN RSS feed and write them to a directory as JSON files.
 
 To configure different behavior, you can specify a different configuration file. There are several pre-built configuration files in the [`configs/`](configs/) directory. If none of them do what you want, consider making a new configuration. See [`configs/configuration.md`](configs/configuration.md) for more details.
+
+# Running with Vagrant
+- [Install Vagrant](https://www.vagrantup.com/downloads.html)
+- Start and provision Vagrant environment with `vagrant up`
+- Enter Vagrant environment with `vagrant ssh`
+
+The project directory is by default mapped to /vagrant in the virtual machine.

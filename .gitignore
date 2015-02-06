@@ -15,3 +15,10 @@ nohup.out
 # IPython debugging
 *.ipynb
 .ipynb_checkpoints
+
+# IntelliJ files
+.idea/
+*.iml
+
+# Vagrant
+.vagrant/

@@ -5,7 +5,9 @@ import hashlib
 import os
 from article import Article
 from bson.objectid import ObjectId
-DB_VERSION = '0.0.7'
+
+DB_VERSION = '0.0.7'
+
 class PrintWriter(object):
     """Class for writing JSON data to the screen."""
 
@@ -14,7 +16,8 @@ class PrintWriter(object):
 
         Arguments:
         article -- A JSON-serializable dictionary.
-        """        # Cannot JSON serialize a datetime object.
+        """
+        # Cannot JSON serialize a datetime object.
         article["download_date"] = str(article["download_date"])
         print json.dumps(article, indent=4, ensure_ascii=False)
 
@@ -29,11 +32,17 @@ class FileWriter(object):
 
         Arguments:
         article -- A JSON-serializable dictionary.
-        """        # Cannot JSON serialize a datetime object.        article["download_date"] = str(article["download_date"])        try:
+        """
+        # Cannot JSON serialize a datetime object.
+        article["download_date"] = str(article["download_date"])
+        try:
             filepath = "test_files/" + hashlib.md5(article["title"].encode("ascii", "ignore")).hexdigest() + ".json"
             pretty_string = json.dumps(article, indent=4)
             with open(filepath, 'w') as output_file:
-                output_file.write(pretty_string)        except:            print article["title"]            raise
+                output_file.write(pretty_string)
+        except:
+            print article["title"]
+            raise
 
 def check_and_make_dir(path):
     """Makes a directory if it doesn't already exist.

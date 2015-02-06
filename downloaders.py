@@ -1,9 +1,10 @@
 from multiprocessing import Pool
-from concurrent.futures import ProcessPoolExecutor, as_completedimport logging
+from concurrent.futures import ProcessPoolExecutor, as_completed
+import logging
 
 class SingleThreadedDownloader(object):
     """Class for downloading and parsing links in a single (current) thread."""
-    
+
     def __init__(self, writer):
         """Create a new SingleThreadedDownloader.
 
@@ -23,8 +24,19 @@ class SingleThreadedDownloader(object):
 
     def process_all(self):
         """Download, scrape, and print all queued articles."""
-        for article in self._articles:            article_dict = _run(article)            if article_dict is not None:                self._writer.write(article_dict)
-
+        for article in self._articles:
+            try:
+                article.download_and_parse()
+                self._writer.write(article.to_dict())
+            except NotImplementedError:
+                # We must of encountered a video article - just skip over it.
+                logging.warning("Encountered an unparsable article: %s" % article.url)
+            except IOError:
+                logger.error("Could not download the following article: %s\nReason: %s" % (article.url, e))
+            except ValueError, e:
+                logging.error("Could not parse the article: %s\nReason: %s" % (article.url, e))
+            except Exception, e:
+                logging.exception("An unspecified error occurred while processing the URL: %s" % article.url)
         # Clear the queue when we finish.
         self._articles = []
 
@@ -37,17 +49,9 @@ def _run(article):
     article -- The article to process.
 
     Return a JSON serializable dictionary of the article's data.
-    """    try:
-        article.download_and_parse()        return article.to_dict()
-    except NotImplementedError:
-        # We must of encountered a video article - just skip over it.
-        logging.warning("Encountered an unparsable article: %s" % article.url)
-    except IOError:
-        logger.error("Could not download the following article: %s\nReason: %s" % (article.url, e))
-    except ValueError, e:
-        logging.error("Could not parse the article: %s\nReason: %s" % (article.url, e))
-    except Exception, e:
-        logging.exception("An unspecified error occurred while processing the URL: %s" % article.url)    return None
+    """
+    article.download_and_parse()
+    return article.to_dict()
 
 class MultiProcessDownloader(object):
     def __init__(self, threads, writer):
@@ -65,12 +69,12 @@ class MultiProcessDownloader(object):
 
     def _write(self, article):
         """Internal method for writing parsed articles in the main thread.
-        
+
         Arguments:
         article -- A dictionary to output
-        """        if article is not None:
-            self._writer.write(article)
-    
+        """
+        self._writer.write(article)
+
     def process_all(self):
         """Download, scrape, and print all queued articles."""
         with ProcessPoolExecutor(max_workers=self._threads) as executor:

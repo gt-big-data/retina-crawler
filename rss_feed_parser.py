@@ -62,7 +62,7 @@ class RssFeedParser(object):
 
     def get_new_articles(self):
         resp = feedparser.parse(self.rss_url, etag = self.etag)
-        
+
         if resp.status == 304: # Not modified
             if 'etag' in resp:
                 raise Exception('ERR_NO_MOD_ETAG,Updated etag should not happen when the resource was not modified.')

@@ -69,7 +69,7 @@ class ModularCrawler(object):
         Arguments:
         args -- The args variable given to the crawler.
 
-        Return an integer representing the number of processes to spawn for this crawler. Will 
+        Return an integer representing the number of processes to spawn for this crawler. Will
         raise an exception if something goes wrong.
         """
         try:
@@ -91,7 +91,7 @@ class ModularCrawler(object):
         Arguments:
         writer -- The output writer to use.
         threads -- The number of threads to utilize.
-        
+
         Return a Downloader for downloading articles.
         """
         if threads == 1:
@@ -157,59 +157,19 @@ class ModularCrawler(object):
 
     def crawl(self):
         """Crawl all provided feeds and URLs for content.
-        
-        This method is designed to be called repeatedly. It will block until completion. It is 
+
+        This method is designed to be called repeatedly. It will block until completion. It is
         designed to never raise exceptions.
-        
-        Return True if the crawl method should be called again. 
+
+        Return True if the crawl method should be called again.
         """
         self._process_urls()
         self._process_feeds()
         self._downloader.process_all()
         return self._feeds is not None
 
-def process_article(args):
-    article, mongo_kw_args = args
-    try:
-        article.download_and_parse()
-        MongoWriter(**mongo_kw_args).write(article)
-        return article
-    except Exception, e:
-        logging.exception(e)
-        return None
-
-class MultipleRSSMongoCrawler(object):
-    def __init__(self, config):
-        self._rss_parser = MultipleRSSFeedParser(config['feeds'])
-        mongo_kw_args = config['mongo_params']
-        self._mongo_kw_args = mongo_kw_args
-        self._article_writer = MongoWriter(**mongo_kw_args)
-        self._logger = logging.getLogger('retina-crawler')
-        self._pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
-
-    def crawl(self):
-        new_articles = self._rss_parser.get_new_articles()
-        if not new_articles:
-            return True
-        self._pool.map(
-            process_article,
-            [(article, self._mongo_kw_args) for article in new_articles if article]
-        )
-        return True
-
 class ExplodingTestCrawler(object):
     def crawl(self):
         if random.random() > 0.5:
            raise Exception(random.choice(['Bam', 'Boom', 'Kapow']))
         return True
-
-class SimpleRunner(object):
-    def __init__(self):
-        self._rssParser = RssFeedParser('http://rss.cnn.com/rss/edition.rss')
-        self._article_writer = FileWriter()
-
-    def run(self):
-        for link in self._rssParser.get_new_links():
-            article = Article.create(link)
-            self._article_writer.write(article.to_dict())
-        return self._feeds is not None

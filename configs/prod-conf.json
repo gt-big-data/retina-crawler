@@ -5,9 +5,11 @@
         "output" : "mongo",
         "feeds" : [
             "http://rss.cnn.com/rss/edition.rss",
-            "http://feeds.abcnews.com/abcnews/topstories",
             "http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml",
-            "http://www.ajc.com/list/rss/news/local/news-georgia-and-region/aCxP/"
+            "http://feeds.reuters.com/reuters/topNews",
+            "http://feeds.nbcnews.com/feeds/topstories",
+            "http://feeds.foxnews.com/foxnews/most-popular",
+            "http://feeds.wired.com/wired/index"
         ],
         "mongo_params": {
             "host" : "146.148.59.202",
