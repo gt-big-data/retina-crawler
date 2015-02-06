@@ -8,8 +8,7 @@
             "http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml",
             "http://feeds.reuters.com/reuters/topNews",
             "http://feeds.nbcnews.com/feeds/topstories",
-            "http://feeds.foxnews.com/foxnews/most-popular",
-            "http://feeds.wired.com/wired/index"
+            "http://feeds.foxnews.com/foxnews/most-popular"
         ],
         "mongo_params": {
             "host" : "146.148.59.202",
