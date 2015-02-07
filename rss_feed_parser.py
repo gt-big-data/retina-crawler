@@ -6,12 +6,12 @@ import logging
 from datetime import datetime
 
 class RssFeedParser(object):
-    def __init__(self, rss_url):
+    def __init__(self, rss_url, visited_tracker):
         self.etag = None
         self.rss_url = rss_url
         self.etag_filename = self._get_filename(rss_url)
         self.feed_update_count = 0
-        self._previous_entries = {}
+        self._visited_tracker = visited_tracker
 
         try:
             with open(self.etag_filename) as old_etag_file:
@@ -53,12 +53,11 @@ class RssFeedParser(object):
 
     def _filter_new(self, entries):
         for link, entry in entries:
-            if link not in self._previous_entries:
-                yield link, entry
-                self._previous_entries[link] = set([entry.published_parsed])
-            elif entry.published_parsed not in self._previous_entries[link]:
-                yield link, entry
-                self._previous_entries[link].add(entry.published_parsed)
+            if self._visited_tracker.is_visited(link):
+                continue
+            
+            yield link, entry
+            self._visited_tracker.mark_visited(link)
 
     def get_new_articles(self):
         resp = feedparser.parse(self.rss_url, etag = self.etag)

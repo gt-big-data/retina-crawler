@@ -7,12 +7,14 @@ import sys
 import random
 import logging
 import time
+from visited import MemoryVistedTracker
 
 class ModularCrawler(object):
     def __init__(self, args):
         writer = self._get_writer(args)
         threads = self._get_threads(args)
         downloader = self._get_downloader(writer, threads)
+        visited_tracker = MemoryVistedTracker(MAX=10000)
 
         try:
             self._urls = args["urls"]
@@ -22,7 +24,7 @@ class ModularCrawler(object):
 
         try:
             self._feeds = args["feeds"]
-            self._feed_parsers = [RssFeedParser(feed_url) for feed_url in self._feeds]
+            self._feed_parsers = [RssFeedParser(feed_url, visited_tracker) for feed_url in self._feeds]
         except KeyError:
             # Passing in feeds is optional.
             self._feeds = None
@@ -31,6 +33,7 @@ class ModularCrawler(object):
             raise ValueError("No URLs or feeds were specified for processing.")
 
         self._downloader = downloader
+        self._visited_tracker = visited_tracker
 
     def _get_writer(self, args):
         """Create and return an output writer based on the given input value.
@@ -121,10 +124,9 @@ class ModularCrawler(object):
         if self._feeds is None:
             return
         try:
-            for feed in self._feeds:
+            for feed_parser in self._feed_parsers:
                 # all of the nested try excepts
                 try:
-                    feed_parser = RssFeedParser(feed)
                     for article in feed_parser.get_new_articles():
                         self._downloader.queue_article(article)
                 except Exception, e:
@@ -132,28 +134,6 @@ class ModularCrawler(object):
                     print e
         except TypeError:
             raise ValueError("'feeds' must be a list of RSS feed URLs to process.")
-
-    def __init__(self, args):
-        writer = self._get_writer(args)
-        threads = self._get_threads(args)
-        downloader = self._get_downloader(writer, threads)
-
-        try:
-            self._urls = args["urls"]
-        except KeyError:
-            # Passing in individual URLs is optional.
-            self._urls = None
-
-        try:
-            self._feeds = args["feeds"]
-        except KeyError:
-            # Passing in feeds is optional.
-            self._feeds = None
-
-        if self._urls is None and self._feeds is None:
-            raise ValueError("No URLs or feeds were specified for processing.")
-
-        self._downloader = downloader
 
     def crawl(self):
         """Crawl all provided feeds and URLs for content.
