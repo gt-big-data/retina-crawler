@@ -9,6 +9,10 @@ from bson.objectid import ObjectId
 
 DB_VERSION = '0.0.7'
 
+'''
+If DB_VERSION is new, update the version number in 
+a designated document in articles collection
+'''
 try:
     u = UpdateVersion()
     current = u.get_version_number()
