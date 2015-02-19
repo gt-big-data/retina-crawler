@@ -43,6 +43,7 @@ class SingleThreadedDownloader(object):
     def process_all(self):
         """Download, scrape, and print all queued articles."""
         for article in self._articles:
+            process(article)
             self._writer.write(article)
         # Clear the queue when we finish.
         self._articles = []
