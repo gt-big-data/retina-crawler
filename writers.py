@@ -3,10 +3,19 @@ import pymongo
 import sys
 import hashlib
 import os
+from update_version import UpdateVersion
 from article import Article
 from bson.objectid import ObjectId
 
 DB_VERSION = '0.0.7'
+
+try:
+    u = UpdateVersion()
+    current = u.get_version_number()
+    if current != DB_VERSION:
+        u.update_version_number(DB_VERSION)
+except:
+    pass
 
 class PrintWriter(object):
     """Class for writing JSON data to the screen."""
