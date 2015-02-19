@@ -19,6 +19,3 @@ class UpdateVersion():
         query = {"_id" : "version"}
         doc = self.db.articles.find_one(query)
         return doc["number"]
-
-u = UpdateVersion()
-u.add_version_number("0.0.7")
