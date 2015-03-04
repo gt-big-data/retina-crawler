@@ -1,5 +1,5 @@
 from datetime import date
-from urlparse import urlparse
+from urlparse import urlparse,urljoin
 import newspaper
 from opengraph import OpenGraph
 from BeautifulSoup import BeautifulSoup as BS
@@ -112,11 +112,14 @@ def _get_data(doc, path=[], selector=None, field=None, first=False):
         return None
 
 def _get_out_links(article):
-    #Need to add base url to cnn stuff, and needs to focus on only relevent links
+    #Needs to focus on only relevent links(is it an actual article)
     soup = BS(article.html)
+    soup.prettify()
     for link in soup.findAll('a'):
-        print(link.get('href'))
-        article.out_links.append(link.get('href'))
+        out_link = link['href']
+        if (out_link[0] == "/"):
+            out_link = urljoin(article.url, link['href'])
+        article.out_links.append(out_link)
 
 def _parse_schema_org(article, doc):
     if _get_meta(doc, {'name': 'medium'}) == "video":
@@ -199,6 +202,7 @@ def _parse_extra(article, doc):
 def parse_article(article, doc):
     # Each parser will only update fields if there is no data already.
     # Note that the final newspaper parser is the only one that finds text.
+    _get_out_links(article)
     _parse_open_graph(article)
     _parse_schema_org(article, doc)
     _parse_newspaper(article)
