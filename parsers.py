@@ -116,9 +116,7 @@ def _get_out_links(article):
     soup = BS(article.html)
     soup.prettify()
     for link in soup.findAll('a'):
-        out_link = link['href']
-        if (out_link[0] == "/"):
-            out_link = urljoin(article.url, link['href'])
+        out_link = link.get('href')
         article.out_links.append(out_link)
 
 def _parse_schema_org(article, doc):
@@ -202,9 +200,9 @@ def _parse_extra(article, doc):
 def parse_article(article, doc):
     # Each parser will only update fields if there is no data already.
     # Note that the final newspaper parser is the only one that finds text.
-    _get_out_links(article)
     _parse_open_graph(article)
     _parse_schema_org(article, doc)
     _parse_newspaper(article)
     _parse_extra(article, doc)
+    _get_out_links(article)
     _sanity_check(article)

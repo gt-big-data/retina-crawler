@@ -10,7 +10,7 @@ from bson.objectid import ObjectId
 DB_VERSION = '0.0.7'
 
 '''
-If DB_VERSION is new, update the version number in 
+If DB_VERSION is new, update the version number in
 a designated document in articles collection
 '''
 try:
@@ -90,6 +90,7 @@ class MongoWriter():
             'location' : article.location,
             'meta_favicon' : article.meta_favicon,
             'meta_lang' : article.meta_lang,
+            'out_links' : article.out_links,
             'recent_download_date' : article.download_date,
             'recent_pub_date' : article.pub_date,
             'source_domain' : article.source_domain,
