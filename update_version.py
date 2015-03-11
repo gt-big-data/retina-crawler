@@ -1,4 +1,5 @@
 import pymongo
+import sys
 
 class UpdateVersion():
 
@@ -19,3 +20,7 @@ class UpdateVersion():
         query = {"_id" : "version"}
         doc = self.db.articles.find_one(query)
         return doc["number"]
+
+u = UpdateVersion()
+num = sys.argv[1]
+u.update_version_number(num)
