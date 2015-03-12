@@ -1,17 +1,18 @@
 import feedparser
 import urlparse
-from article import Article
+from article import Article, RecursiveArticle
 import time
 import logging
 from datetime import datetime
 
 class RssFeedParser(object):
-    def __init__(self, rss_url, visited_tracker):
+    def __init__(self, rss_url, visited_tracker, link_sink):
         self.etag = None
         self.rss_url = rss_url
         self.etag_filename = self._get_filename(rss_url)
         self.feed_update_count = 0
         self._visited_tracker = visited_tracker
+        self._link_sink = link_sink
 
         try:
             with open(self.etag_filename) as old_etag_file:
@@ -78,7 +79,7 @@ class RssFeedParser(object):
 
         new_articles = []
         for link, entry in self._filter_new(self._unique_entries_by_link(resp.entries)):
-            article = Article(link)
+            article = RecursiveArticle(link, self._link_sink, depth=0)
             new_articles.append(article)
 
         logging.info('{_type},{time},{feed},{update_count},{num_entries},{new_entries}'.format(
@@ -101,4 +102,34 @@ class MultipleRSSFeedParser(object):
         new_articles = []
         for parser in self._parsers:
             new_articles.extend(parser.get_new_articles())
+        return new_articles
+
+class RecursiveArticleSource(object):
+    def __init__(self, visited_tracker, max_depth=1):
+        self._visited_tracker = visited_tracker
+        self._articles = []
+        self._max_depth = max_depth
+
+    def add_article_url(self, base_article, article_url):
+        if self._visited_tracker.is_visited(article_url):
+            return False
+
+        self._visited_tracker.mark_visited(article_url)
+
+        new_article = RecursiveArticle(
+            article_url,
+            self,
+            depth=base_article.depth + 1,
+            parent_url=base_article.url
+        )
+
+        if new_article.depth > self._max_depth:
+            return False
+
+        self._articles.append(new_article)
+        return True
+
+    def get_new_articles(self):
+        new_articles = self._articles
+        self._articles = []
         return new_articles

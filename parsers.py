@@ -1,5 +1,5 @@
 from datetime import date
-from urlparse import urlparse,urljoin
+from urlparse import urlparse, urljoin
 import newspaper
 from opengraph import OpenGraph
 from BeautifulSoup import BeautifulSoup as BS
@@ -117,7 +117,7 @@ def _get_out_links(article):
     soup.prettify()
     for link in soup.findAll('a'):
         out_link = link.get('href')
-        article.out_links.append(out_link)
+        article.out_links.append(urljoin(article.url, out_link))
 
 def _parse_schema_org(article, doc):
     if _get_meta(doc, {'name': 'medium'}) == "video":
@@ -182,6 +182,7 @@ def _parse_extra(article, doc):
     article.keywords = good(article.keywords) or article.categories
     article.pub_date = good(article.pub_date) or _get_data(doc, path=[".//time"], field="datetime", first=True)
     _extract_category(article)
+    _get_out_links(article)
 
     # If all else fails, get the published day (not time) from the URL.
     try:

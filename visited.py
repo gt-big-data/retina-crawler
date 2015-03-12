@@ -20,19 +20,16 @@ class MemoryVistedTracker(VisitedTracker):
         self._max = MAX
 
     def is_visited(self, url):
-        #return url in self._cache
-        return False
+        return url in self._cache
 
     def _evict(self, n=1):
         LOGGER.info('MemoryVisitedTracker,Now evicting {} items..'.format(n))
         old_urls = sorted(self._cache.iteritems(), key=lambda x: x[1])[:n]
         for url, date in old_urls:
-            LOGGER.info('MemoryVisitedTracker,Evicted {}'.format(url))
             del self._cache[url]
 
     def mark_visited(self, url, insert_time=None):
         insert_time = insert_time or datetime.now()
-        #LOGGER.info('MemoryVisitedTracker,Visited {} at {}'.format(url, insert_time))
         if url in self._cache:
             self._cache[url] = insert_time
             return
