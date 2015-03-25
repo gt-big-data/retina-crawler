@@ -22,5 +22,5 @@ class UpdateVersion():
         return doc["number"]
 
 u = UpdateVersion()
-num = sys.argv[0]
+num = sys.argv[1]
 u.update_version_number(num)

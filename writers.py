@@ -4,7 +4,7 @@ import sys
 import hashlib
 import os
 from update_version import UpdateVersion
-from article import Article
+from article import Article, RecursiveArticle
 from bson.objectid import ObjectId
 
 DB_VERSION = '0.0.7'
@@ -106,11 +106,13 @@ class MongoWriter():
         article_doc_updates = {
             'authors' : article.authors,
             'categories' : article.categories,
+            'depth' : article.depth,
             'images' : article.images,
             'keywords' : article.keywords,
             'location' : article.location,
             'meta_favicon' : article.meta_favicon,
             'meta_lang' : article.meta_lang,
+            'out_links' : article.out_links,
             'recent_download_date' : article.download_date,
             'recent_pub_date' : article.pub_date,
             'source_domain' : article.source_domain,
@@ -121,6 +123,10 @@ class MongoWriter():
             'url' : article.url,
             'v' : DB_VERSION
         }
+
+        if type(article) is RecursiveArticle:
+            if article.parent_url:
+                article_doc_updates['parent_url'] = article.parent_url
 
         article_doc_history = {
             'history' : {

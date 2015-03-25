@@ -16,6 +16,7 @@ class Article(object):
         self.source_domain = None
         self.text = None
         self.title = None
+        self.depth = None
         self.download_date = None
         self.authors = None
         self.categories = None
@@ -53,3 +54,15 @@ class Article(object):
             raise Exception('This article ({}) has already been parsed.'.format(self.url))
         self.download()
         self.parse()
+
+class RecursiveArticle(Article):
+    def __init__(self, link, link_sink, depth=0, parent_url=None):
+        super(RecursiveArticle, self).__init__(link)
+        self._link_sink = link_sink
+        self.depth = depth
+        self.parent_url = parent_url
+
+    def download_and_parse(self):
+        super(RecursiveArticle, self).download_and_parse()
+        for out_link in self.out_links:
+            self._link_sink.add_article_url(self, out_link)
