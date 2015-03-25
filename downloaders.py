@@ -13,11 +13,11 @@ def process(article):
         # We must of encountered a video article - just skip over it.
         logging.warning("Encountered an unparsable article: %s" % article.url)
     except IOError:
-        logger.error("Could not download the following article: %s\nReason: %s" % (article.url, e))
+        logging.error("Could not download the following article: %s\nReason: %s" % (article.url, e))
     except ValueError, e:
         logging.error("Could not parse the article: %s\nReason: %s" % (article.url, e))
     except Exception, e:
-        logging.exception("An unspecified error occurred while processing the URL: %s" % article.url)
+        logging.exception(e)
     return None
 
 class SingleThreadedDownloader(object):
