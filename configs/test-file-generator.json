@@ -1,0 +1,11 @@
+{
+    "crawler" : "ModularCrawler",
+    "args" : {
+        "threads" : "1",
+        "output" : "file",
+        "urls" : [
+          ["basic-cnn.json", "http://edition.cnn.com/2015/02/06/football/borussia-dortmund-german-bundesliga-demise/index.html?eref=edition"],
+          ["basic-nyt.json", "http://www.nytimes.com/2015/03/26/world/europe/germanwings-airbus-crash.html?_r=0"]
+        ]
+    }
+}
