@@ -112,7 +112,13 @@ class ModularCrawler(object):
             return
         try:
             for url in self._urls:
-                article = Article(url)
+                # a "URL" is either a URL and filename or just a URL.
+                try:
+                    filename, real_url = url
+                    article = Article(real_url)
+                    article.filename = filename
+                except ValueError, e:
+                    article = Article(url)
                 self._downloader.queue_article(article)
         except TypeError:
             raise ValueError("'urls' must be a list of article URLs to process.")

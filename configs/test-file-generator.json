@@ -1,0 +1,23 @@
+{
+    "Comment" : [
+      "When running this file, make sure to manually verify all of the JSON files it generates.",
+      "These will be used in the future as known good test data.",
+      "Only urls under 'urls' will be downloaded. The other groups are just for documentation purposes."
+    ],
+    "crawler" : "ModularCrawler",
+    "args" : {
+        "threads" : "1",
+        "output" : "file",
+        "known_bad_urls" : [
+          ["basic-reuters.json", "http://www.reuters.com/article/2015/03/25/us-mideast-crisis-iraq-confirmation-idUSKBN0ML27Q20150325"]
+        ],
+        "known_good_urls" : [
+          ["basic-cnn.json", "http://edition.cnn.com/2015/02/06/football/borussia-dortmund-german-bundesliga-demise/index.html?eref=edition"],
+          ["basic-nyt.json", "http://www.nytimes.com/2015/03/26/world/europe/germanwings-airbus-crash.html?_r=0"],
+          ["basic-fox.json", "http://www.foxnews.com/world/2015/03/25/investigators-face-daunting-search-for-clues-to-germanwings-flight-disaster/?intcmp=latestnews"],
+          ["basic-nbc.json", "http://www.nbcnews.com/storyline/german-plane-crash/germanwings-airbus-a320-crash-yvonne-emily-selke-idd-dead-americans-n329946"]
+        ],
+        "urls" : [
+          ]
+    }
+}

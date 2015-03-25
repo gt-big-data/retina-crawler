@@ -3,8 +3,20 @@ import json
 import unittest
 from datetime import datetime
 from urlparse import urlparse
+from os import path
+from main import load_config
 
-class TestParser(unittest.TestCase):
+class BaseSiteTest(unittest.TestCase):
+    def __init__(self, json_file):
+        super(self.__class__, self).__init__()
+        self.json_file = json_file
+        self.article = None
+
+    def runTest(self):
+        for test in dir(self):
+            if test.startswith("test"):
+                getattr(self, test)()
+
     # Don't test article.download_date because I'm faking it anyways.
     def _parse(self):
         article = Article(self.data["url"])
@@ -19,14 +31,13 @@ class TestParser(unittest.TestCase):
     def setUp(self):
         # self.data is a dict that vaguely resembles what a fully constructed
         # Article would look like.
-        with open("test_files/basic.json") as data:
-            self.data = json.load(data)
-        self.data["download_date"] = datetime.utcnow()
-        with open("test_files/basic.html") as html:
-            self.data["html"] = html.read()
-        self.article = None
+        with open(self.json_file) as json_data:
+            self.data = json.load(json_data)
 
         self._parse()
+
+    def all_tests(self):
+        pass
 
     def test_url(self):
         self.assertEqual(self.data["url"], self.article.url)
@@ -74,7 +85,19 @@ class TestParser(unittest.TestCase):
         #self.assertEqual(self.data["meta_lang"], self.article.meta_lang)
 
     def test_pub_date(self):
-        self.assertEqual(self.data["pub_date"], self.article.pub_date)
+        self.assertEqual(self.data["recent_pub_date"], self.article.pub_date)
 
 if __name__ == '__main__':
-    unittest.main()
+    config = load_config(path.join("configs", "test-file-generator.json"))
+    data = [filename for filename, url in config["args"]["known_good_urls"]]
+    print "Working..."
+    suites = []
+    for d in data:
+        json_file = path.join("test_files", d)
+        print "Loading: %s" % json_file
+        test_suite = BaseSiteTest(json_file)
+        suites.append(test_suite)
+
+    runner = unittest.TextTestRunner()
+    for suite in suites:
+        runner.run(suite)

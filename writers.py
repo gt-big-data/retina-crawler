@@ -46,15 +46,36 @@ class FileWriter(object):
         Arguments:
         article -- A JSON-serializable dictionary.
         """
-        # Cannot JSON serialize a datetime object.
-        article["download_date"] = str(article["download_date"])
+        article_serializable = {
+            'authors' : article.authors,
+            'categories' : article.categories,
+            'images' : article.images,
+            'keywords' : article.keywords,
+            'location' : article.location,
+            'meta_favicon' : article.meta_favicon,
+            'meta_lang' : article.meta_lang,
+            'recent_download_date' : str(article.download_date),
+            'recent_pub_date' : str(article.pub_date),
+            'source_domain' : article.source_domain,
+            'suggested_articles' : article.suggested_articles,
+            'summary' : article.summary,
+            'text' : article.text,
+            'title' : article.title,
+            'url' : article.url,
+            'html': article.html
+        }
+        if article.__dict__.has_key("filename"):
+            filename = article.filename
+        else:
+            filename = hashlib.md5(article_serializable["title"].encode("ascii", "ignore")).hexdigest() + ".json"
+
         try:
-            filepath = "test_files/" + hashlib.md5(article["title"].encode("ascii", "ignore")).hexdigest() + ".json"
-            pretty_string = json.dumps(article, indent=4)
+            filepath = "test_files/" + filename
+            pretty_string = json.dumps(article_serializable, indent=4)
             with open(filepath, 'w') as output_file:
                 output_file.write(pretty_string)
         except:
-            print article["title"]
+            print article.title
             raise
 
 def check_and_make_dir(path):
