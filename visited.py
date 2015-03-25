@@ -26,17 +26,15 @@ class MemoryVistedTracker(VisitedTracker):
         LOGGER.info('MemoryVisitedTracker,Now evicting {} items..'.format(n))
         old_urls = sorted(self._cache.iteritems(), key=lambda x: x[1])[:n]
         for url, date in old_urls:
-            LOGGER.info('MemoryVisitedTracker,Evicted {}'.format(url))
             del self._cache[url]
 
     def mark_visited(self, url, insert_time=None):
         insert_time = insert_time or datetime.now()
-        LOGGER.info('MemoryVisitedTracker,Visited {} at {}'.format(url, insert_time))
         if url in self._cache:
             self._cache[url] = insert_time
             return
 
         if len(self._cache) > self._max:
             self._evict(self._max // 10)
-        
+
         self._cache[url] = url

@@ -11,4 +11,5 @@ git clone https://github.com/gt-big-data/retina-crawler.git
 cd $HOME
 cd retina-crawler/
 sudo pip install -r deploy/requirements.txt
+python update_version.py "0.0.7"
 deploy/run.sh

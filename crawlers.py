@@ -1,4 +1,4 @@
-from rss_feed_parser import RssFeedParser, MultipleRSSFeedParser
+from rss_feed_parser import RssFeedParser, MultipleRSSFeedParser, RecursiveArticleSource
 from writers import *
 from article import Article
 from downloaders import *
@@ -24,7 +24,8 @@ class ModularCrawler(object):
 
         try:
             self._feeds = args["feeds"]
-            self._feed_parsers = [RssFeedParser(feed_url, visited_tracker) for feed_url in self._feeds]
+            self._recursive_source = RecursiveArticleSource(visited_tracker)
+            self._feed_parsers = [RssFeedParser(feed_url, visited_tracker, self._recursive_source) for feed_url in self._feeds]
         except KeyError:
             # Passing in feeds is optional.
             self._feeds = None
@@ -130,8 +131,11 @@ class ModularCrawler(object):
                     for article in feed_parser.get_new_articles():
                         self._downloader.queue_article(article)
                 except Exception, e:
-                    print feed + " is bad"
-                    print e
+                    logging.exception(e)
+
+            for article in self._recursive_source.get_new_articles():
+                self._downloader.queue_article(article)
+
         except TypeError:
             raise ValueError("'feeds' must be a list of RSS feed URLs to process.")
 
