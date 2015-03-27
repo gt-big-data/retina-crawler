@@ -1,5 +1,5 @@
 import feedparser
-import urlparse
+import urllib.parse
 from article import Article, RecursiveArticle
 import time
 import logging
@@ -23,7 +23,7 @@ class RssFeedParser(object):
             pass
 
     def _get_filename(self, rss_url):
-        p = urlparse.urlparse(rss_url)
+        p = urllib.parse.urlparse(rss_url)
         path_parts = [part for part in p.path.split('/') if part]
         path_formatted = '-'.join(path_parts)
         return '{domain}.{path}.etag'.format(
@@ -48,7 +48,7 @@ class RssFeedParser(object):
             else:
                 rss_entries_by_link[entry.link] = [entry]
 
-        for link, rss_entries in rss_entries_by_link.iteritems():
+        for link, rss_entries in rss_entries_by_link.items():
             selected_entry = self._deduplicate_entries(rss_entries)
             yield link, selected_entry
 

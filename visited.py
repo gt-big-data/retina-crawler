@@ -24,7 +24,7 @@ class MemoryVistedTracker(VisitedTracker):
 
     def _evict(self, n=1):
         LOGGER.info('MemoryVisitedTracker,Now evicting {} items..'.format(n))
-        old_urls = sorted(self._cache.iteritems(), key=lambda x: x[1])[:n]
+        old_urls = sorted(iter(self._cache.items()), key=lambda x: x[1])[:n]
         for url, date in old_urls:
             del self._cache[url]
 

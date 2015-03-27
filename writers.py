@@ -32,7 +32,7 @@ class PrintWriter(object):
         """
         # Cannot JSON serialize a datetime object.
         article["download_date"] = str(article["download_date"])
-        print json.dumps(article, indent=4, ensure_ascii=False)
+        print(json.dumps(article, indent=4, ensure_ascii=False))
 
 class FileWriter(object):
     """Class for writing JSON data to a file."""
@@ -64,7 +64,7 @@ class FileWriter(object):
             'url' : article.url,
             'html': article.html
         }
-        if article.__dict__.has_key("filename"):
+        if "filename" in article.__dict__:
             filename = article.filename
         else:
             filename = hashlib.md5(article_serializable["title"].encode("ascii", "ignore")).hexdigest() + ".json"
@@ -75,7 +75,7 @@ class FileWriter(object):
             with open(filepath, 'w') as output_file:
                 output_file.write(pretty_string)
         except:
-            print article.title
+            print(article.title)
             raise
 
 def check_and_make_dir(path):
@@ -140,7 +140,6 @@ class MongoWriter():
             '_id' : html_id,
             'html' : html
         }
-
         db.articles.update(
             {'url' : article.url},
             {

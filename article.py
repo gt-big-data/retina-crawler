@@ -1,7 +1,7 @@
 import requests
 from datetime import datetime
 import parsers
-from urlparse import urlparse
+from urllib.parse import urlparse
 from lxml.html.clean import clean_html
 from lxml.html import document_fromstring
 
@@ -9,7 +9,7 @@ class Article(object):
 
     def to_dict(self):
         # Return a copy of all public values.
-        return {k: v for k, v in self.__dict__.iteritems() if not k.startswith('_')}
+        return {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
 
     def __init__(self, url, parser=None):
         self.url = url

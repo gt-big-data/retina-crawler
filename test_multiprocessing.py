@@ -19,10 +19,10 @@ def main():
     arts = f.get_new_articles()
     p = Pool(5)
     parsed = p.map(run, arts)
-    print 'fetched', len(arts), 'in ', time.time() - start, 'seconds'
+    print('fetched', len(arts), 'in ', time.time() - start, 'seconds')
     start = time.time()
     p.map(write, [(art, 'localhost', 27017) for art in parsed])
-    print 'wrote', len(arts), 'in ', time.time() - start, 'seconds'
+    print('wrote', len(arts), 'in ', time.time() - start, 'seconds')
 
 
 if __name__ == '__main__':

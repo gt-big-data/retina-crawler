@@ -14,9 +14,9 @@ def process(article):
         logging.warning("Encountered an unparsable article: %s" % article.url)
     except IOError:
         logging.error("Could not download the following article: %s\nReason: %s" % (article.url, e))
-    except ValueError, e:
+    except ValueError as e:
         logging.error("Could not parse the article: %s\nReason: %s" % (article.url, e))
-    except Exception, e:
+    except Exception as e:
         logging.exception(e)
     return None
 

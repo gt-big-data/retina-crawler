@@ -1,10 +1,12 @@
 from datetime import date
-from urlparse import urlparse, urljoin
+from urllib.parse import urlparse, urljoin
 import newspaper
-from opengraph import OpenGraph
-from BeautifulSoup import BeautifulSoup as BS
+from bs4 import BeautifulSoup as BS
 import re
 import nltk
+
+def get_opengraph(doc, value):
+    return _get_data(doc, ["head", "og:" + value], field="content")
 
 def good(obj):
     """Determine if a value has good data.
@@ -26,7 +28,7 @@ def good(obj):
 
     return obj
 
-def _sanity_check(article):
+def _sanity_check(article, doc):
     """Check that all required fields in the article have been filled in.
 
     Throw a ValueError if anything is missing.
@@ -57,8 +59,8 @@ def _get_favicon(doc):
     return _get_data(doc, path=["link"], selector={'rel':'shortcut icon'}, field='href')[0]
 
 def _get_selector(selector):
-    pairs = (u"@%s='%s'" % (k, v) for k,v in selector.iteritems())
-    return u"[%s]" % (" and ".join(pairs))
+    pairs = ("@%s='%s'" % (k, v) for k,v in selector.items())
+    return "[%s]" % (" and ".join(pairs))
 
 def _get_meta(doc, selector, first=True):
     """Get metadata from the html.
@@ -91,7 +93,7 @@ def _get_data(doc, path=[], selector=None, field=None, first=False):
 
     Return a list of all elements that match the path.
     """
-    path_text = u"//%s" % "//".join(path)
+    path_text = "//%s" % "//".join(path)
 
     if selector is not None:
         selector_text = _get_selector(selector)
@@ -99,12 +101,12 @@ def _get_data(doc, path=[], selector=None, field=None, first=False):
         selector_text = ""
 
     if field is not None:
-        field_text = u"/@%s" % field
+        field_text = "/@%s" % field
     else:
-        field_text = u""
+        field_text = ""
 
     try:
-        result = doc.xpath(u"%s%s%s" % (path_text, selector_text, field_text))
+        result = doc.xpath("%s%s%s" % (path_text, selector_text, field_text))
         if first:
             return result[0]
         else:
@@ -112,7 +114,7 @@ def _get_data(doc, path=[], selector=None, field=None, first=False):
     except Exception:
         return None
 
-def _get_out_links(article):
+def _get_out_links(article, doc):
     #Needs to focus on only relevent links(is it an actual article)
     soup = BS(article.html)
     soup.prettify()
@@ -134,26 +136,21 @@ def _parse_schema_org(article, doc):
     article.summary = good(article.summary) or _get_meta(doc, {'itemprop': 'description'})
     article.meta_lang = good(article.meta_lang) or _get_meta(doc, {'itemprop': 'inLanguage'})
 
-def _parse_open_graph(article):
-    og = OpenGraph(html=article.html)
-    if not og.is_valid():
-        return
+def _parse_open_graph(article, doc):
+    article_type = get_opengraph(doc, "type")
+    if good(article_type) and article_type != "article":
+        raise NotImplementedError("Cannot parse a OG type: %s" % article_type)
 
-    if og["type"] != "article":
-        raise NotImplementedError("Cannot parse a OG type: %s" % og["type"])
+    article.title = good(article.title) or get_opengraph(doc, "title")
+    article.summary = good(article.summary) or get_opengraph(doc, "description")
+    article.images = good(article.images) or [get_opengraph(doc, "image")]
+    article.meta_lang = good(article.meta_lang) or get_opengraph(doc, "locale")
+    article.keywords = good(article.keywords) or get_opengraph(doc, "tag")
+    article.categories = good(article.categories) or [get_opengraph(doc, "category")]
+    article.authors = good(article.authors) or [get_opengraph(doc, "author")]
+    article.pub_date = good(article.pub_date) or get_opengraph(doc, "modified_date")
 
-    og.setdefault(None)
-
-    article.title = good(article.title) or og.get("title")
-    article.summary = good(article.summary) or og.get("description")
-    article.images = good(article.images) or [og.get("image")]
-    article.meta_lang = good(article.meta_lang) or og.get("locale")
-    article.keywords = good(article.keywords) or og.get("tag")
-    article.categories = good(article.categories) or [og.get("category")]
-    article.authors = good(article.authors) or [og.get("author")]
-    article.pub_date = good(article.pub_date) or og.get("modified_date")
-
-def _parse_newspaper(article):
+def _parse_newspaper(article, doc):
     newspaper_article = newspaper.build_article(article.url)
     newspaper_article.set_html(article.html)
     newspaper_article.parse()
@@ -164,12 +161,12 @@ def _parse_newspaper(article):
         keywords = newspaper_article.keywords or []
         other_keywords = newspaper_article.meta_keywords or []
         article.keywords = list(set(keywords + other_keywords))
-    article.images = good(article.images) or newspaper_article.images
+    article.images = good(article.images) or list(newspaper_article.images)
     article.summary = good(article.summary) or newspaper_article.summary
     article.summary = good(article.summary) or nltk.sent_tokenize(newspaper_article.text)[0]
     article.meta_favicon = good(article.meta_favicon) or newspaper_article.meta_favicon
     article.meta_lang = good(article.meta_lang) or newspaper_article.meta_lang
-    article.pub_date = good(article.pub_date) or newspaper_article.published_date
+    article.pub_date = good(article.pub_date) or newspaper_article.publish_date
 
 def _extract_category(article):
     if good(article.categories):
@@ -184,7 +181,6 @@ def _parse_extra(article, doc):
     article.keywords = good(article.keywords) or article.categories
     article.pub_date = good(article.pub_date) or _get_data(doc, path=[".//time"], field="datetime", first=True)
     _extract_category(article)
-    _get_out_links(article)
 
     # If all else fails, get the published day (not time) from the URL.
     try:
@@ -201,11 +197,14 @@ def _parse_extra(article, doc):
     #TODO: Get suggested articles out of the article.
 
 def parse_article(article, doc):
-    # Each parser will only update fields if there is no data already.
-    # Note that the final newspaper parser is the only one that finds text.
-    _parse_open_graph(article)
-    _parse_schema_org(article, doc)
-    _parse_newspaper(article)
-    _parse_extra(article, doc)
-    _get_out_links(article)
-    _sanity_check(article)
+    parsers = [
+        _parse_open_graph,
+        _parse_schema_org,
+        _parse_newspaper, # Only one that finds body text.
+        _parse_extra,
+        _get_out_links,
+        _sanity_check # Errors if something is bad.
+    ]
+
+    for parser in parsers:
+        parser(article, doc)

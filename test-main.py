@@ -2,7 +2,7 @@ from article import Article
 import json
 import unittest
 from datetime import datetime
-from urlparse import urlparse
+from urllib.parse import urlparse
 from os import path
 from main import load_config
 
@@ -90,11 +90,11 @@ class BaseSiteTest(unittest.TestCase):
 if __name__ == '__main__':
     config = load_config(path.join("configs", "test-file-generator.json"))
     data = [filename for filename, url in config["args"]["known_good_urls"]]
-    print "Working..."
+    print("Working...")
     suites = []
     for d in data:
         json_file = path.join("test_files", d)
-        print "Loading: %s" % json_file
+        print("Loading: %s" % json_file)
         test_suite = BaseSiteTest(json_file)
         suites.append(test_suite)
 

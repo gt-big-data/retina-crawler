@@ -21,7 +21,7 @@ def load_config(config_file_path):
         with open(config_file_path) as f:
             try:
                 config = json.load(f)
-            except ValueError, e:
+            except ValueError as e:
                 raise ValueError("Could not load the configuration file: %s" % e)
             return config
     except IOError:
@@ -60,7 +60,7 @@ def load_crawler(config):
 
 def main():
     if len(sys.argv) != 2:
-        print "Usage: python main.py path/to/config.json"
+        print("Usage: python main.py path/to/config.json")
         sys.exit(1)
 
     logging.basicConfig(level=logging.INFO)
@@ -69,12 +69,12 @@ def main():
 
     try:
         config = load_config(sys.argv[1])
-    except ValueError, e:
+    except ValueError as e:
         logger.error("There was a problem with the given configuration: %s." % e)
         sys.exit(-1)
     try:
         crawler = load_crawler(config)
-    except ValueError, e:
+    except ValueError as e:
         logger.error("There was a problem initializing the crawler with the given configuration: %s." % e)
         sys.exit(-1)
 
@@ -99,7 +99,7 @@ def main():
         except KeyboardInterrupt:
             logger.info("Terminating early by user request.")
             sys.exit(1)
-        except Exception, e:
+        except Exception as e:
             # This code should not be called and is considered a bug if it does.
             logger.exception(e)
             time.sleep(5.0) #TODO():
