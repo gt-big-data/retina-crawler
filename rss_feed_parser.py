@@ -36,10 +36,15 @@ class RssFeedParser(object):
         with open(self.etag_filename, 'w+') as etag_file:
             etag_file.write(etag)
 
-    def _deduplicate_entries(self, rss_entries):
+    def _select_max(self, rss_entries):
         return max(rss_entries, key=lambda entry: entry.published_parsed)
 
     def _unique_entries_by_link(self, rss_entries):
+        '''
+        rss feeds can have the same link in them several times,
+        due to updates of the same article. We only want to 
+        download the most recent version of an article
+        '''
         rss_entries_by_link = {}
 
         for entry in rss_entries:
@@ -48,17 +53,22 @@ class RssFeedParser(object):
             else:
                 rss_entries_by_link[entry.link] = [entry]
 
+<<<<<<< HEAD
         for link, rss_entries in rss_entries_by_link.items():
             selected_entry = self._deduplicate_entries(rss_entries)
             yield link, selected_entry
+=======
+        for link, rss_entries in rss_entries_by_link.iteritems():
+            yield link, self._select_max(rss_entries)
+>>>>>>> 6b3792c7878d985d9f6532810df1c355ddb9c84a
 
     def _filter_new(self, entries):
         for link, entry in entries:
             if self._visited_tracker.is_visited(link):
                 continue
             
-            yield link, entry
             self._visited_tracker.mark_visited(link)
+            yield link, entry
 
     def get_new_articles(self):
         resp = feedparser.parse(self.rss_url, etag = self.etag)
@@ -130,6 +140,7 @@ class RecursiveArticleSource(object):
         return True
 
     def get_new_articles(self):
+        assert len(set(self._articles)) == len(self._articles), 'Only unique articles should be added'
         new_articles = self._articles
         self._articles = []
         return new_articles
