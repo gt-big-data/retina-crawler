@@ -1,6 +1,7 @@
 from multiprocessing import Pool
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import logging
+import datetime
 
 def process(article):
     """Return True if the article should be written. If it returns False, something
@@ -8,6 +9,7 @@ def process(article):
     """
     try:
         article.download_and_parse()
+        logging.info('PROCESSED:{}:{}'.format(article.url, datetime.datetime.now()))
         return article
     except NotImplementedError:
         # We must of encountered a video article - just skip over it.

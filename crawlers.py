@@ -136,11 +136,12 @@ class ModularCrawler(object):
                 try:
                     for article in feed_parser.get_new_articles():
                         self._downloader.queue_article(article)
+
+                    for article in self._recursive_source.get_new_articles():
+                        self._downloader.queue_article(article)
+
                 except Exception, e:
                     logging.exception(e)
-
-            for article in self._recursive_source.get_new_articles():
-                self._downloader.queue_article(article)
 
         except TypeError:
             raise ValueError("'feeds' must be a list of RSS feed URLs to process.")
