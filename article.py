@@ -44,7 +44,7 @@ class Article(object):
         self.source_domain = urlparse(self.url).netloc
         try:
             response = requests.get(self.url)
-            self.html = response.content
+            self.html = response.content.decode()
             self.url = response.url # Deals with redirects.
         except requests.exceptions.RequestException:
             raise IOError("Could not download the article at: %s" % self.url)

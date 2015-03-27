@@ -1,3 +1,3 @@
 #!/bin/sh
 
-nohup python main.py configs/prod-config.json &
+nohup python3 main.py configs/prod-config.json &
