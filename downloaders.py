@@ -14,7 +14,7 @@ def process(article):
     except NotImplementedError:
         # We must of encountered a video article - just skip over it.
         logging.warning("Encountered an unparsable article: %s" % article.url)
-    except IOError:
+    except IOError as e:
         logging.error("Could not download the following article: %s\nReason: %s" % (article.url, e))
     except ValueError as e:
         logging.error("Could not parse the article: %s\nReason: %s" % (article.url, e))
