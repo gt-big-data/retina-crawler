@@ -181,17 +181,7 @@ def _parse_extra(article, doc):
     article.keywords = good(article.keywords) or article.categories
     article.pub_date = good(article.pub_date) or _get_data(doc, path=[".//time"], field="datetime", first=True)
     _extract_category(article)
-
-    # If all else fails, get the published day (not time) from the URL.
-    try:
-        year = date.today().year
-        pieces = article.url.split("/%d/" % year)[1].split("/")
-        month = pieces[0]
-        day = pieces[1]
-        article.pub_date = good(article.pub_date) or "%d-%s-%s" % (year, month, day)
-    except Exception:
-        # I give up - Take the download date.
-        article.pub_date = str(article.pub_date or article.download_date)
+    article.pub_date = article.pub_date or article.download_date
 
     #TODO: Get title image out of the article.
     #TODO: Get suggested articles out of the article.
