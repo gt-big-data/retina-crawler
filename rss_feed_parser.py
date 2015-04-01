@@ -54,8 +54,7 @@ class RssFeedParser(object):
                 rss_entries_by_link[entry.link] = [entry]
 
         for link, rss_entries in rss_entries_by_link.items():
-            selected_entry = self._deduplicate_entries(rss_entries)
-            yield link, selected_entry
+            yield link, self._select_max(rss_entries)
 
     def _filter_new(self, entries):
         for link, entry in entries:
