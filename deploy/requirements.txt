@@ -1,4 +1,4 @@
-BeautifulSoup==3.2.1
+BeautifulSoup4==4.3.2
 Pillow==2.5.3
 cssselect==0.9.1
 feedparser==5.1.3

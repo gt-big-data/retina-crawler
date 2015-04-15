@@ -42,7 +42,7 @@ class RssFeedParser(object):
     def _unique_entries_by_link(self, rss_entries):
         '''
         rss feeds can have the same link in them several times,
-        due to updates of the same article. We only want to 
+        due to updates of the same article. We only want to
         download the most recent version of an article
         '''
         rss_entries_by_link = {}
@@ -53,20 +53,14 @@ class RssFeedParser(object):
             else:
                 rss_entries_by_link[entry.link] = [entry]
 
-<<<<<<< HEAD
         for link, rss_entries in rss_entries_by_link.items():
-            selected_entry = self._deduplicate_entries(rss_entries)
-            yield link, selected_entry
-=======
-        for link, rss_entries in rss_entries_by_link.iteritems():
             yield link, self._select_max(rss_entries)
->>>>>>> 6b3792c7878d985d9f6532810df1c355ddb9c84a
 
     def _filter_new(self, entries):
         for link, entry in entries:
             if self._visited_tracker.is_visited(link):
                 continue
-            
+
             self._visited_tracker.mark_visited(link)
             yield link, entry
 
