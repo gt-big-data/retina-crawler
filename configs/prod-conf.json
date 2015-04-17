@@ -1,7 +1,7 @@
 {
     "crawler" : "ModularCrawler",
     "args" : {
-        "threads" : "0",
+        "threads" : "1",
         "output" : "mongo",
         "feeds" : [
             "http://rss.cnn.com/rss/edition.rss",
