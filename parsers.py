@@ -163,7 +163,10 @@ def _parse_newspaper(article, doc):
         article.keywords = list(set(keywords + other_keywords))
     article.images = good(article.images) or list(newspaper_article.images)
     article.summary = good(article.summary) or newspaper_article.summary
-    article.summary = good(article.summary) or nltk.sent_tokenize(newspaper_article.text)[0]
+    if not good(article.summary):
+        other_summary = nltk.sent_tokenize(newspaper_article.text)
+        if len(other_summary) > 0:
+            article.summary = other_summary[0]
     article.meta_favicon = good(article.meta_favicon) or newspaper_article.meta_favicon
     article.meta_lang = good(article.meta_lang) or newspaper_article.meta_lang
     article.pub_date = good(article.pub_date) or newspaper_article.publish_date
